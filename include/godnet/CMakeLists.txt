@@ -6,8 +6,10 @@ set(GODNET_SRC
 # 创建库
 add_library(godnet ${GODNET_SRC})
 set_target_compile(godnet)
-if (BUILD_SHARED_LIBS)
-    target_compile_definitions(godnet PRIVATE
+
+# 设置导出宏
+target_compile_definitions(godnet PRIVATE
+    $<$<BOOL:${BUILD_SHARED_LIBS}>:
         GODNET_DYNAMIC
-    )
-endif()
+    >
+)
