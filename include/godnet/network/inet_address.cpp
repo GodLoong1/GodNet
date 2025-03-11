@@ -1,7 +1,6 @@
 #include "godnet/network/inet_address.hpp"
 
 #include "godnet/exception.hpp"
-#include <sys/socket.h>
 
 namespace godnet
 {
