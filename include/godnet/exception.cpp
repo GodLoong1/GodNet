@@ -13,12 +13,13 @@ GodNetException::GodNetException(const char* file, int line,
 #elif defined(GODNET_WIN)
     file = ::strrchr(file, '\\') + 1;
 #endif
-    msg_.append(file)
+    msg_.append("[")
+        .append(file)
         .append(":")
         .append(std::to_string(line))
-        .append(":")
+        .append(" - ")
         .append(func)
-        .append(": ")
+        .append("]: ")
         .append(msg);
 }
 
