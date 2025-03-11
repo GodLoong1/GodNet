@@ -26,3 +26,5 @@
 #elif defined(GODNET_LINUX)
     #define GODNET_FUNCTION __PRETTY_FUNCTION__
 #endif
+
+#endif
