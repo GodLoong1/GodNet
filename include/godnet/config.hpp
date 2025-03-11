@@ -23,6 +23,6 @@
 
 #if defined(GODNET_WIN)
     #define GODNET_FUNCTION __FUNCSIG__
-#endif
+#elif defined(GODNET_LINUX)
     #define GODNET_FUNCTION __PRETTY_FUNCTION__
 #endif
