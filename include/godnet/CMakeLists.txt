@@ -6,6 +6,7 @@ set(GODNET_SRC
 # 创建库
 add_library(godnet ${GODNET_SRC})
 set_target_compile(godnet)
+set_target_properties(godnet PROPERTIES DEFINE_SYMBOL "")
 
 # 设置导出宏
 target_compile_definitions(godnet PRIVATE
