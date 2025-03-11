@@ -6,7 +6,7 @@
 #include "godnet/config.hpp"
 #include "godnet/network/socket_types.hpp"
 
-namespace godnet::socket_ops
+namespace godnet
 {
 
 

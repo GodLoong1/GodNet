@@ -1,5 +1,6 @@
 # 编译文件
 set(GODNET_SRC
+    exception.cpp
     network/inet_address.cpp
 )
 

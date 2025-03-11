@@ -3,11 +3,13 @@
 
 #pragma once
 
+#include "godnet/config.hpp"
+
 #if defined(GODNET_WIN)
     #include <WinSock2.h>
     #include <ws2tcpip.h>
     #pragma comment(lib, "ws2_32.lib")
-#else
+#elif defined(GODNET_LINUX)
     #include <sys/types.h>
     #include <sys/socket.h>
     #include <netinet/in.h>
@@ -20,9 +22,9 @@ namespace godnet
 #if defined(GODNET_WIN)
     using socket_t = ::SOCKET;
     using socklen_t = int;
-#else
+#elif defined(GODNET_LINUX)
     using socket_t = int;
-    using socklen_t = socklen_t;
+    using socklen_t = ::socklen_t;
     constexpr socket_t INVALID_SOCKET = -1;
 #endif
 

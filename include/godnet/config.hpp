@@ -19,8 +19,10 @@
     #endif
 #elif defined(GODNET_LINUX)
     #define GODNET_EXPORT __attribute__((visibility("default")))
-#else
-    #error "Unsupported platform"
 #endif
 
+#if defined(GODNET_WIN)
+    #define GODNET_FUNCTION __FUNCSIG__
+#endif
+    #define GODNET_FUNCTION __PRETTY_FUNCTION__
 #endif
