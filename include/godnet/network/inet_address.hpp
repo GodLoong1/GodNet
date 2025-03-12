@@ -1,8 +1,6 @@
 #ifndef GODNET_NETWORK_INET_ADDRESS_HPP
 #define GODNET_NETWORK_INET_ADDRESS_HPP
 
-#pragma once
-
 #include "godnet/config.hpp"
 #include "godnet/network/socket_types.hpp"
 

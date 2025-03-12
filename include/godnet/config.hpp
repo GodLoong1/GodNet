@@ -1,8 +1,6 @@
 #ifndef GODNET_CONFIG_HPP
 #define GODNET_CONFIG_HPP
 
-#pragma once
-
 #if defined(_WIN32) || defined(_WIN64)
     #define GODNET_WIN
 #elif defined(__linux__)

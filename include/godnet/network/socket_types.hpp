@@ -1,8 +1,6 @@
 #ifndef GODNET_NETWORK_SOCKET_TYPES_HPP
 #define GODNET_NETWORK_SOCKET_TYPES_HPP
 
-#pragma once
-
 #include "godnet/config.hpp"
 
 #if defined(GODNET_WIN)
