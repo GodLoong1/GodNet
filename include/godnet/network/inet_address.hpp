@@ -17,7 +17,6 @@ public:
     InetAddress();
     InetAddress(std::string_view ip, std::uint16_t port);
 
-    int protocol() const;
     int family() const;
 
     bool isV4() const;

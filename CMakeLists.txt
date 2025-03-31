@@ -13,7 +13,6 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
 # 设置C++标准
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF)
 message(STATUS "C++ standard: ${CMAKE_CXX_STANDARD}")
 
 # 配置编译类型（Debug/Release）
@@ -62,7 +61,7 @@ function(set_target_compile target)
             -Wshadow             # 变量隐藏警告
             -Wunused             # 未使用警告
             -Wconversion         # 类型转换警告
-            -Wsign-conversion    # 符号转换警告
+            # -Wsign-conversion    # 符号转换警告
             -Wdouble-promotion   # float到double提升警告
             -Wformat=2           # 格式化字符串检查
             $<$<CONFIG:Debug>:
@@ -82,7 +81,10 @@ message(STATUS "Compiler: ${CMAKE_CXX_COMPILER_ID}")
 
 # 头文件目录
 include_directories(${CMAKE_SOURCE_DIR}/include)
+include_directories(${CMAKE_SOURCE_DIR}/third_party/fmt/include)
 
 # 添加子目录
 add_subdirectory(${CMAKE_SOURCE_DIR}/include/godnet)
 add_subdirectory(${CMAKE_SOURCE_DIR}/test)
+
+add_subdirectory(${CMAKE_SOURCE_DIR}/third_party/fmt)

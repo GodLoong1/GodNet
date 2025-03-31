@@ -28,13 +28,8 @@ InetAddress::InetAddress(std::string_view ip, std::uint16_t port)
     }
     else
     {
-        GODNET_THROW("Invalid IP address");
+        GODNET_THROW("Invalid IP address, {}:{}", ip, port);
     }
-}
-
-int InetAddress::protocol() const
-{
-    return SOCK_STREAM;
 }
 
 int InetAddress::family() const

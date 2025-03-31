@@ -1,4 +1,5 @@
 #include "godnet/network/inet_address.hpp"
+#include <exception>
 #include <iostream>
 #include "godnet/exception.hpp"
 
