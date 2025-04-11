@@ -10,7 +10,8 @@
 #endif
 
 #if defined(GODNET_WIN)
-    #if defined(GODNET_DYNAMIC)
+    // 构建动态库定义宏
+    #if defined(GODNET_BUILD_SHARED)
         #define GODNET_EXPORT __declspec(dllexport)
     #else
         #define GODNET_EXPORT __declspec(dllimport)
@@ -24,5 +25,20 @@
 #elif defined(GODNET_LINUX)
     #define GODNET_FUNCTION __PRETTY_FUNCTION__
 #endif
+
+namespace godnet
+{
+
+class Noncopyable
+{
+public:
+    Noncopyable() noexcept = default;
+    ~Noncopyable() noexcept = default;
+
+    Noncopyable(const Noncopyable&) noexcept = delete;
+    Noncopyable& operator=(const Noncopyable&) noexcept = delete;
+};
+
+}
 
 #endif

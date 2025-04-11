@@ -82,6 +82,7 @@ message(STATUS "Compiler: ${CMAKE_CXX_COMPILER_ID}")
 # 头文件目录
 include_directories(${CMAKE_SOURCE_DIR}/include)
 include_directories(${CMAKE_SOURCE_DIR}/third_party/fmt/include)
+include_directories(${CMAKE_SOURCE_DIR}/third_party/wepoll)
 
 # 添加子目录
 add_subdirectory(${CMAKE_SOURCE_DIR}/include/godnet)

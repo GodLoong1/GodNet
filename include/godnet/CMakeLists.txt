@@ -1,5 +1,6 @@
 # 编译文件
 set(GODNET_SRC
+    debug.cpp
     network/inet_address.cpp
 )
 

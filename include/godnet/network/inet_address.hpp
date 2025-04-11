@@ -17,14 +17,23 @@ public:
     InetAddress();
     InetAddress(std::string_view ip, std::uint16_t port);
 
-    int family() const;
+    int family() const noexcept
+    {
+        return data_.base.sa_family;
+    }
 
-    bool isV4() const;
-    bool isV6() const;
+    bool isV4() const noexcept
+    {
+        return data_.base.sa_family == AF_INET;
+    }
+
+    bool isV6() const noexcept
+    {
+        return data_.base.sa_family == AF_INET6;
+    }
 
     std::string ip() const;
     std::uint16_t port() const;
-    std::string ipPort() const;
 
 private:
     union
