@@ -120,6 +120,8 @@ public:
     void disableAll();
     void update();
     void handlerEvent();
+
+private:
     void handlerEventSafe();
 
 private:

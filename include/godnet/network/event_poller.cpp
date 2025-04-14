@@ -33,11 +33,11 @@ EventPoller::~EventPoller()
     }
 }
 
-void EventPoller::wait(std::vector<EventChannel*>& readyChannels)
+void EventPoller::poll(std::vector<EventChannel*>& readyChannels, int timeout)
 {
     loop_->assertInLoop();
 
-    int ready = ::epoll_wait(epoll_fd_, events_.data(), static_cast<int>(events_.size()), -1);
+    int ready = ::epoll_wait(epoll_fd_, events_.data(), static_cast<int>(events_.size()), timeout);
     if (ready > 0)
     {
         if (ready == static_cast<int>(events_.size()))
@@ -74,6 +74,13 @@ void EventPoller::update(EventChannel* channel)
         ctl(EPOLL_CTL_MOD, channel);
     }
 }
+
+#if defined(GODNET_WIN)
+void EventPoller::postEvent(std::uint64_t event)
+{
+    epoll_post_signal(epoll_fd_, event);
+}
+#endif
 
 void EventPoller::ctl(int op, EventChannel* channel)
 {

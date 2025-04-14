@@ -4,7 +4,7 @@
 #include "godnet/config.hpp"
 #include "godnet/util/noncopyable.hpp"
 
-
+#include <cstdint>
 #include <vector>
 #include <unordered_set>
 
@@ -22,14 +22,22 @@ public:
     explicit EventPoller(EventLoop* loop);
     ~EventPoller();
 
-    void wait(std::vector<EventChannel*>& readyChannels);
+    void poll(std::vector<EventChannel*>& readyChannels, int timeout = -1);
     void update(EventChannel* channel);
+
+#if defined(GODNET_WIN)
+    void postEvent(std::uint64_t event);
+#endif
 
 private:
     void ctl(int op, EventChannel* channel);
 
     EventLoop* loop_;
+#if defined(GODNET_LINUX)
     int epoll_fd_;
+#elif defined(GODNET_WIN)
+    void* epoll_fd_;
+#endif
     std::vector<struct epoll_event> events_;
     std::unordered_set<EventChannel*> channels_;
 };
