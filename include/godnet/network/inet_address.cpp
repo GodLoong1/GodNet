@@ -1,6 +1,6 @@
 #include "godnet/network/inet_address.hpp"
 
-#include "godnet/debug.hpp"
+#include "godnet/util/debug.hpp"
 
 namespace godnet
 {

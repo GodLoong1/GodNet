@@ -26,19 +26,4 @@
     #define GODNET_FUNCTION __PRETTY_FUNCTION__
 #endif
 
-namespace godnet
-{
-
-class Noncopyable
-{
-public:
-    Noncopyable() noexcept = default;
-    ~Noncopyable() noexcept = default;
-
-    Noncopyable(const Noncopyable&) noexcept = delete;
-    Noncopyable& operator=(const Noncopyable&) noexcept = delete;
-};
-
-}
-
 #endif

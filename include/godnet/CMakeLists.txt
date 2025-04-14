@@ -1,6 +1,6 @@
 # 编译文件
 set(GODNET_SRC
-    debug.cpp
+    util/debug.cpp
     network/inet_address.cpp
 )
 
@@ -13,6 +13,6 @@ set_target_properties(godnet PROPERTIES DEFINE_SYMBOL "")
 # 设置导出宏
 target_compile_definitions(godnet PRIVATE
     $<$<BOOL:${BUILD_SHARED_LIBS}>:
-        GODNET_DYNAMIC
+        GODNET_BUILD_SHARE
     >
 )

@@ -10,10 +10,14 @@
 #define GODNET_THROW(msg) \
     throw godnet::GodNetException(__FILE__, __LINE__, GODNET_FUNCTION, msg)
 
-#define GODNET_ASSERT(expr) \
-    static_cast<bool>(expr) ? \
-    (void)0 : \
-    __assert_fail(#expr, __FILE__, __LINE__, GODNET_FUNCTION)
+#ifndef GODNET_NDEBUG
+    #define GODNET_ASSERT(expr) \
+        static_cast<bool>(expr) ? \
+        static_cast<void>(0) : \
+        __assert_fail(#expr, __FILE__, __LINE__, GODNET_FUNCTION)
+#else
+    #define GODNET_ASSERT(expr) static_cast<void>(expr)
+#endif
 
 namespace godnet
 {

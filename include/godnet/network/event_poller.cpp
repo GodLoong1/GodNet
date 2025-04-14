@@ -1,6 +1,6 @@
 #include "godnet/network/event_poller.hpp"
 
-#include "godnet/debug.hpp"
+#include "godnet/util/debug.hpp"
 #include "godnet/network/event_loop.hpp"
 #include "godnet/network/event_channel.hpp"
 
@@ -72,6 +72,18 @@ void EventPoller::update(EventChannel* channel)
     else
     {
         ctl(EPOLL_CTL_MOD, channel);
+    }
+}
+
+void EventPoller::ctl(int op, EventChannel* channel)
+{
+    struct epoll_event ev;
+    ev.data.ptr = channel;
+    ev.events = channel->getEvents();
+
+    if (::epoll_ctl(epoll_fd_, op, channel->getFd(), &ev) < 0)
+    {
+        GODNET_THROW("epoll_ctl error");
     }
 }
 

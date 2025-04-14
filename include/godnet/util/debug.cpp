@@ -1,4 +1,4 @@
-#include "godnet/debug.hpp"
+#include "godnet/util/debug.hpp"
 
 #include <cstring>
 #include <fmt/format.h>

@@ -2,6 +2,7 @@
 #define GODNET_NETWORK_EVENT_CHANNEL_HPP
 
 #include "godnet/config.hpp"
+#include "godnet/util/noncopyable.hpp"
 
 #include <cstdint>
 #include <functional>
@@ -122,21 +123,20 @@ public:
     void handlerEventSafe();
 
 private:
-    EventLoop* const loop_;
-    const int fd_;
-    std::uint32_t events_;
-    std::uint32_t revents_;
+    EventLoop* const loop_{};
+    const int fd_{};
+    std::uint32_t events_{};
+    std::uint32_t revents_{};
 
-    EventCallback read_callback_;
-    EventCallback write_callback_;
-    EventCallback error_callback_;
-    EventCallback close_callback_;
-    EventCallback event_callback_;
+    EventCallback read_callback_{};
+    EventCallback write_callback_{};
+    EventCallback error_callback_{};
+    EventCallback close_callback_{};
+    EventCallback event_callback_{};
 
-    bool is_bind;
-    std::weak_ptr<void> object_handler_;
-
-    bool is_handling_;
+    bool is_bind{};
+    bool is_handling_{};
+    std::weak_ptr<void> object_handler_{};
 };
 
 }

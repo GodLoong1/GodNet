@@ -1,6 +1,6 @@
 #include "godnet/network/event_channel.hpp"
 
-#include "godnet/debug.hpp"
+#include "godnet/util/debug.hpp"
 #include "godnet/network/event_loop.hpp"
 
 #include <cassert>

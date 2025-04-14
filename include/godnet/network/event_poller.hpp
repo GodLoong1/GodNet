@@ -2,6 +2,8 @@
 #define GODNET_NETWORK_EVENT_POLLER_HPP
 
 #include "godnet/config.hpp"
+#include "godnet/util/noncopyable.hpp"
+
 
 #include <vector>
 #include <unordered_set>
@@ -14,7 +16,7 @@ namespace godnet
 class EventLoop;
 class EventChannel;
 
-class GODNET_EXPORT EventPoller
+class GODNET_EXPORT EventPoller : Noncopyable
 {
 public:
     explicit EventPoller(EventLoop* loop);
