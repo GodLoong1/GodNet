@@ -66,21 +66,22 @@ void EventPoller::update(EventChannel* channel)
 
     if (channels_.find(channel) != channels_.end())
     {
-        ctl(EPOLL_CTL_ADD, channel);
-        channels_.insert(channel);
+        if (channel->isNone())
+        {
+            ctl(EPOLL_CTL_ADD, channel);
+            channels_.erase(channel);
+        }
+        else
+        {
+            ctl(EPOLL_CTL_ADD, channel);
+            channels_.insert(channel);
+        }
     }
     else
     {
         ctl(EPOLL_CTL_MOD, channel);
     }
 }
-
-#if defined(GODNET_WIN)
-void EventPoller::postEvent(std::uint64_t event)
-{
-    epoll_post_signal(epoll_fd_, event);
-}
-#endif
 
 void EventPoller::ctl(int op, EventChannel* channel)
 {

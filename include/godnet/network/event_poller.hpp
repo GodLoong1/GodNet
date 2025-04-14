@@ -25,10 +25,6 @@ public:
     void poll(std::vector<EventChannel*>& readyChannels, int timeout = -1);
     void update(EventChannel* channel);
 
-#if defined(GODNET_WIN)
-    void postEvent(std::uint64_t event);
-#endif
-
 private:
     void ctl(int op, EventChannel* channel);
 
