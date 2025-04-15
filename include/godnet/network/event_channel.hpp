@@ -16,6 +16,10 @@ class EventLoop;
 class GODNET_EXPORT EventChannel : Noncopyable
 {
 public:
+    static const std::uint32_t NONE_EVENT;
+    static const std::uint32_t READ_EVENT;
+    static const std::uint32_t WRITE_EVENT;
+
     using EventCallback = std::function<void()>;
 
     EventChannel(EventLoop* loop, int fd);
@@ -108,23 +112,57 @@ public:
         revents_ = revents;
     }
 
-    void enableReading();
-    void disableReading();
-    bool isReading() const noexcept;
+    void enableReading()
+    {
+        events_ |= READ_EVENT;
+        update();
+    }
 
-    void enableWriting();
-    void disableWriting();
-    bool isWriting() const noexcept;
+    void disableReading()
+    {
+        events_ &= ~READ_EVENT;
+        update();
+    }
 
-    bool isNone() const noexcept;
-    void disableAll();
+    bool isReading() const noexcept
+    {
+        return events_ & READ_EVENT;
+    }
+
+    void enableWriting()
+    {
+        events_ |= WRITE_EVENT;
+        update();
+    }
+
+    void disableWriting()
+    {
+        events_ &= ~WRITE_EVENT;
+        update();
+    }
+
+    bool isWriting() const noexcept
+    {
+        return events_ & WRITE_EVENT;
+    }
+
+    bool isNone() const noexcept
+    {
+        return events_ == NONE_EVENT;
+    }
+
+    void disableAll()
+    {
+        events_ = NONE_EVENT;
+        update();
+    }
+
     void update();
     void handlerEvent();
 
 private:
     void handlerEventSafe();
 
-private:
     EventLoop* const loop_{};
     const int fd_{};
     std::uint32_t events_{};

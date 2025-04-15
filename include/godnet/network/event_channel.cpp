@@ -14,18 +14,16 @@
 namespace godnet
 {
 
+const std::uint32_t EventChannel::NONE_EVENT = 0;
+const std::uint32_t EventChannel::READ_EVENT = EPOLLIN | EPOLLPRI;
+const std::uint32_t EventChannel::WRITE_EVENT = EPOLLOUT;
+
 EventChannel::EventChannel(EventLoop* loop, int fd)
 : loop_(loop),
   fd_(fd)
 {
-    if (!loop)
-    {
-        GODNET_THROW("EventLoop is null");
-    }
-    if (fd < 0)
-    {
-        GODNET_THROW("Invalid file descriptor");
-    }
+    GODNET_THROW_IF(!loop, "EventLoop is null");
+    GODNET_THROW_IF(fd < 0, "Invalid file descriptor");
 }
 
 EventChannel::~EventChannel()
@@ -33,59 +31,17 @@ EventChannel::~EventChannel()
     GODNET_ASSERT(!is_handling_ && "EventChannel is handling events");
 }
 
-void EventChannel::enableReading()
-{
-    events_ |= EPOLLIN;
-    update();
-}
-
-void EventChannel::disableReading()
-{
-    events_ &= ~EPOLLIN;
-    update();
-}
-
-bool EventChannel::isReading() const noexcept
-{
-    return events_ & EPOLLIN;
-}
-
-void EventChannel::enableWriting()
-{
-    events_ |= (EPOLLOUT | EPOLLPRI);
-    update();
-}
-
-void EventChannel::disableWriting()
-{
-    events_ &= ~(EPOLLOUT | EPOLLPRI);
-    update();
-}
-
-bool EventChannel::isWriting() const noexcept
-{
-    return events_ & (EPOLLOUT | EPOLLPRI);
-}
-
-bool EventChannel::isNone() const noexcept
-{
-    return events_ == 0;
-}
-
-void EventChannel::disableAll()
-{
-    events_ = 0;
-    update();
-}
-
 void EventChannel::update()
 {
+    loop_->assertInLoop();
     loop_->updateChannel(this);
 }
 
 void EventChannel::handlerEvent()
 {
-    if (events_ == 0)
+    loop_->assertInLoop();
+
+    if (isNone())
     {
         return;
     }

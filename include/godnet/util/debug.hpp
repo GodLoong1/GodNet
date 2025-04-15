@@ -10,6 +10,11 @@
 #define GODNET_THROW(msg) \
     throw godnet::GodNetException(__FILE__, __LINE__, GODNET_FUNCTION, msg)
 
+#define GODNET_THROW_IF(expr, msg) \
+    static_cast<bool>(!(expr)) ? \
+    static_cast<void>(0) : \
+    GODNET_THROW(msg);
+
 #ifndef GODNET_NDEBUG
     #define GODNET_ASSERT(expr) \
         static_cast<bool>(expr) ? \
