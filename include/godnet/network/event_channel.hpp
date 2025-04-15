@@ -118,20 +118,15 @@ public:
         update();
     }
 
-    void disableReading()
-    {
-        events_ &= ~READ_EVENT;
-        update();
-    }
-
-    bool isReading() const noexcept
-    {
-        return events_ & READ_EVENT;
-    }
-
     void enableWriting()
     {
         events_ |= WRITE_EVENT;
+        update();
+    }
+
+    void disableReading()
+    {
+        events_ &= ~READ_EVENT;
         update();
     }
 
@@ -141,20 +136,25 @@ public:
         update();
     }
 
+    void disableAll()
+    {
+        events_ = NONE_EVENT;
+        update();
+    }
+
+    bool isReading() const noexcept
+    {
+        return events_ & READ_EVENT;
+    }
+
     bool isWriting() const noexcept
     {
         return events_ & WRITE_EVENT;
     }
 
-    bool isNone() const noexcept
+    bool isNoneEvent() const noexcept
     {
         return events_ == NONE_EVENT;
-    }
-
-    void disableAll()
-    {
-        events_ = NONE_EVENT;
-        update();
     }
 
     void update();

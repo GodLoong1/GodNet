@@ -41,7 +41,7 @@ void EventChannel::handlerEvent()
 {
     loop_->assertInLoop();
 
-    if (isNone())
+    if (isNoneEvent())
     {
         return;
     }
