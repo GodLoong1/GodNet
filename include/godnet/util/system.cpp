@@ -5,6 +5,7 @@
 #elif defined(GODNET_LINUX)
     #include <unistd.h>
     #include <sys/syscall.h>
+    #include <errno.h>
 #endif
 
 namespace godnet
@@ -19,6 +20,15 @@ std::uint64_t getThreadId() noexcept
     static_cast<std::uint64_t>(::syscall(SYS_gettid));
 #endif
     return thread_id;
+}
+
+GODNET_EXPORT int getSystemErrno() noexcept
+{
+#if defined(GODNET_WIN)
+    return ::WSAGetLastError();
+#elif defined(GODNET_LINUX)
+    return errno;
+#endif
 }
 
 }

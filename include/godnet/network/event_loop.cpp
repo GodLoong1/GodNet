@@ -20,14 +20,15 @@ namespace godnet
 thread_local EventLoop* current_thread_loop{};
 
 EventLoop::EventLoop()
-: thread_id_(getThreadId())
+: thread_id_(system::getThreadId()),
+  poller_(std::make_unique<EventPoller>(this))
 {
     if (current_thread_loop)
     {
         GODNET_THROW("EventLoop already exists in this thread");
     }
     current_thread_loop = this;
-#if defined(GODNET_LINUX)
+
     if ((wakeup_fd_ = ::eventfd(0, EFD_NONBLOCK | EFD_CLOEXEC)) < 0)
     {
         GODNET_THROW("eventfd() failed");
@@ -40,7 +41,7 @@ EventLoop::EventLoop()
             GODNET_THROW("read() failed");
         }
     });
-#endif
+    wakeup_channel_->enableReading();
 }
 
 EventLoop::~EventLoop()
@@ -94,7 +95,7 @@ void EventLoop::quit()
 
 bool EventLoop::isInLoop() const noexcept
 {
-    return thread_id_ == getThreadId();
+    return thread_id_ == system::getThreadId();
 }
 
 void EventLoop::assertInLoop()
@@ -105,14 +106,33 @@ void EventLoop::assertInLoop()
     }
 }
 
+void EventLoop::updateChannel(EventChannel* channel)
+{
+    poller_->update(channel);
+}
+
 void EventLoop::wakeup()
 {
-#if defined(GODNET_LINUX)
     std::uint64_t val{1};
     ::write(wakeup_fd_, &val, sizeof(val));
-#elif defined(GODNET_WIN)
-    poller_->postEvent(1);
-#endif
+}
+
+void EventLoop::queueInLoop(const EventCallback& func)
+{
+    event_callback_queue_.enqueue(func);
+    if (!isInLoop() || !looping_.load(std::memory_order_acquire))
+    {
+        wakeup();
+    }
+}
+
+void EventLoop::queueInLoop(EventCallback&& func)
+{
+    event_callback_queue_.enqueue(std::move(func));
+    if (!isInLoop() || !looping_.load(std::memory_order_acquire))
+    {
+        wakeup();
+    }
 }
 
 }

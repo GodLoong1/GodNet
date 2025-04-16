@@ -18,7 +18,7 @@ EventPoller::EventPoller(EventLoop* loop)
 : loop_(loop),
   events_(32)
 {
-    epoll_fd_ = ::epoll_create(0);
+    epoll_fd_ = ::epoll_create(1);
     if (epoll_fd_ < 0)
     {
         GODNET_THROW("Failed to create epoll file descriptor");
@@ -66,20 +66,20 @@ void EventPoller::update(EventChannel* channel)
 
     if (channels_.find(channel) != channels_.end())
     {
-        if (channel->isNone())
+        if (channel->isNoneEvent())
         {
-            ctl(EPOLL_CTL_ADD, channel);
+            ctl(EPOLL_CTL_DEL, channel);
             channels_.erase(channel);
         }
         else
         {
-            ctl(EPOLL_CTL_ADD, channel);
+            ctl(EPOLL_CTL_MOD, channel);
             channels_.insert(channel);
         }
     }
     else
     {
-        ctl(EPOLL_CTL_MOD, channel);
+        ctl(EPOLL_CTL_ADD, channel);
     }
 }
 

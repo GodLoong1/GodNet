@@ -1,7 +1,12 @@
 # 编译文件
 set(GODNET_SRC
     util/debug.cpp
+    util/system.cpp
+
     network/inet_address.cpp
+    network/event_channel.cpp
+    network/event_loop.cpp
+    network/event_poller.cpp
 )
 
 # 创建库

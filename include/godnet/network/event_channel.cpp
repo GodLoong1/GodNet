@@ -87,7 +87,7 @@ void EventChannel::handlerEventSafe()
             read_callback_();
         }
     }
-    if (revents_ & EPOLLOUT)
+    if (revents_ & EPOLLOUT && !(revents_ & EPOLLHUP))
     {
         if (write_callback_)
         {

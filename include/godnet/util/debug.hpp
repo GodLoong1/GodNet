@@ -6,6 +6,7 @@
 #include <exception>
 #include <string>
 #include <cassert>
+#include <system_error>
 
 #define GODNET_THROW(msg) \
     throw godnet::GodNetException(__FILE__, __LINE__, GODNET_FUNCTION, msg)

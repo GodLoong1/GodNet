@@ -5,10 +5,12 @@
 
 #include <cstdint>
 
-namespace godnet
+namespace godnet::system
 {
 
 GODNET_EXPORT std::uint64_t getThreadId() noexcept;
+
+GODNET_EXPORT int getSystemErrno() noexcept;
 
 }
 

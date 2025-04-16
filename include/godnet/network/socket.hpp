@@ -10,8 +10,10 @@ namespace godnet
 class Socket : Noncopyable
 {
 public:
+    explicit Socket(int sockfd);
 
 private:
+    int sockfd_;
 };
 
 }

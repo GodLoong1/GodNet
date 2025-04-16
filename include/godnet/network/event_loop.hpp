@@ -41,6 +41,7 @@ public:
             queueInLoop(std::forward<Func>(func));
         }
     }
+
     void queueInLoop(const EventCallback& func);
     void queueInLoop(EventCallback&& func);
 
@@ -52,7 +53,6 @@ public:
 private:
     void wakeup();
 
-private:
     std::atomic<bool> looping_{};
     std::atomic<bool> quit_{};
     std::uint64_t thread_id_{};
@@ -61,10 +61,8 @@ private:
     std::vector<EventChannel*> ready_channel_vec_{};
     LockFreeQueue<EventCallback> event_callback_queue_{};
 
-#if defined(GODNET_LINUX)
     int wakeup_fd_{};
     std::unique_ptr<EventChannel> wakeup_channel_{};
-#endif
 };
 
 }
