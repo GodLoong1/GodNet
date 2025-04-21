@@ -2,7 +2,13 @@
 #define GODNET_NETWORK_INET_ADDRESS_HPP
 
 #include "godnet/config.hpp"
-#include "godnet/network/socket_types.hpp"
+
+#if defined(GODNET_WIN)
+    #include <WinSock2.h>
+    #include <ws2tcpip.h>
+#elif defined(GODNET_LINUX)
+    #include <netinet/in.h>
+#endif
 
 #include <string>
 #include <string_view>
@@ -17,19 +23,19 @@ public:
     InetAddress();
     InetAddress(std::string_view ip, std::uint16_t port);
 
-    int family() const noexcept
+    std::uint32_t family() const noexcept
     {
-        return data_.base.sa_family;
+        return static_cast<std::uint32_t>(addr_.base.sa_family);
     }
 
     bool isV4() const noexcept
     {
-        return data_.base.sa_family == AF_INET;
+        return addr_.base.sa_family == AF_INET;
     }
 
     bool isV6() const noexcept
     {
-        return data_.base.sa_family == AF_INET6;
+        return addr_.base.sa_family == AF_INET6;
     }
 
     std::string ip() const;
@@ -38,10 +44,10 @@ public:
 private:
     union
     {
-        sockaddr_t base;
-        sockaddr_in4_t v4;
-        sockaddr_in6_t v6;
-    } data_;
+        sockaddr base;
+        sockaddr_in v4;
+        sockaddr_in6 v6;
+    } addr_{};
 };
 
 }

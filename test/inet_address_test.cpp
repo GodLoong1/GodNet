@@ -3,4 +3,5 @@
 
 int main()
 {
+    godnet::InetAddress addr("fffasfds", 80);
 }

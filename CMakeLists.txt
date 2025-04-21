@@ -55,18 +55,17 @@ function(set_target_compile target)
     elseif (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
         target_compile_options(${target} PRIVATE
             -Wall
+            -rdynamic
             -Wextra
             -Wpedantic
             -Werror
             -Wshadow             # 变量隐藏警告
             -Wunused             # 未使用警告
-            -Wconversion         # 类型转换警告
-            # -Wsign-conversion    # 符号转换警告
             -Wdouble-promotion   # float到double提升警告
             -Wformat=2           # 格式化字符串检查
             $<$<CONFIG:Debug>:
                 -O0
-                -g3
+                -g
             >
             $<$<CONFIG:Release>:
                 -O3
