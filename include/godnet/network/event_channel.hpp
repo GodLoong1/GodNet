@@ -22,7 +22,9 @@ public:
 
     using EventCallback = std::function<void()>;
 
-    EventChannel(EventLoop* loop, int fd);
+    EventChannel(EventLoop* loop, int fd)
+    : loop_(loop), fd_(fd) { }
+
     ~EventChannel();
 
     void setReadCallback(EventCallback&& callback) noexcept

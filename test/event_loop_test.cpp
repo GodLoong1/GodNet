@@ -20,7 +20,6 @@ int main()
     });
     loop.queueInLoop([]{
         std::cout << "Hello, World!" << std::endl;
-        GODNET_THROW(godnet::system::getStackTrace().c_str());
     });
     loop.loop();
 }

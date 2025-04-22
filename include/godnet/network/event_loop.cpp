@@ -25,20 +25,20 @@ EventLoop::EventLoop()
 {
     if (current_thread_loop)
     {
-        GODNET_THROW("EventLoop already exists in this thread");
+        GODNET_THROW_RUNERR("EventLoop already exists in this thread");
     }
     current_thread_loop = this;
 
     if ((wakeup_fd_ = ::eventfd(0, EFD_NONBLOCK | EFD_CLOEXEC)) < 0)
     {
-        GODNET_THROW("eventfd() failed");
+        GODNET_THROW_RUNERR("eventfd() failed");
     }
     wakeup_channel_ = std::make_unique<EventChannel>(this, wakeup_fd_);
     wakeup_channel_->setReadCallback([this] {
         uint64_t val{};
         if (::read(wakeup_fd_, &val, sizeof(val)) < 0)
         {
-            GODNET_THROW("read() failed");
+            GODNET_THROW_RUNERR("read() failed");
         }
     });
     wakeup_channel_->enableReading();
@@ -57,7 +57,7 @@ void EventLoop::loop()
     assertInLoop();
     if (looping_)
     {
-        GODNET_THROW("EventLoop is already looping");
+        GODNET_THROW_RUNERR("EventLoop is already looping");
     }
     looping_.store(true, std::memory_order_release);
     quit_.store(false, std::memory_order_release);

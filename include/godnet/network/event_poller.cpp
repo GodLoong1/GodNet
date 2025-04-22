@@ -21,7 +21,7 @@ EventPoller::EventPoller(EventLoop* loop)
     epoll_fd_ = ::epoll_create(1);
     if (epoll_fd_ < 0)
     {
-        GODNET_THROW("Failed to create epoll file descriptor");
+        GODNET_THROW_RUNERR("Failed to create epoll file descriptor");
     } 
 }
 
@@ -56,7 +56,7 @@ void EventPoller::poll(std::vector<EventChannel*>& readyChannels, int timeout)
     }
     else
     {
-        GODNET_THROW("epoll_wait error");
+        GODNET_THROW_RUNERR("epoll_wait error");
     }
 }
 
@@ -91,7 +91,7 @@ void EventPoller::ctl(int op, EventChannel* channel)
 
     if (::epoll_ctl(epoll_fd_, op, channel->getFd(), &ev) < 0)
     {
-        GODNET_THROW("epoll_ctl error");
+        GODNET_THROW_RUNERR("epoll_ctl error");
     }
 }
 

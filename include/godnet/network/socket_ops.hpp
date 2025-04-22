@@ -2,9 +2,13 @@
 #define GODNET_NETWORK_SOCKET_OPS_HPP
 
 #include "godnet/config.hpp"
-#include "godnet/network/socket_types.hpp"
 
-namespace godnet::socket_ops
+namespace godnet
+{
+
+class InetAddress;
+
+namespace socket_ops
 {
 
 void setNonBlock(int sockfd);
@@ -13,11 +17,11 @@ int createTcpSocket(int family);
 
 int closeSocket(int sockfd);
 
-int bindAddress(int sockfd, struct sockaddr* sockaddr, socklen_t socklen);
+int bindAddress(int sockfd, const InetAddress& addr);
 
 int listenSocket(int sockfd);
 
-int acceptSocket(int sockfd, struct sockaddr* sockaddr, socklen_t* socklen);
+int acceptSocket(int sockfd, InetAddress& addr);
 
 int closeWrite(int sockfd);
 
@@ -31,6 +35,7 @@ int setKeepAlive(int sockfd, bool on);
 
 int getSocketError(int sockfd);
 
+}
 }
 
 #endif

@@ -52,9 +52,9 @@ int closeSocket(int sockfd)
 #endif
 }
 
-int bindAddress(int sockfd, struct sockaddr* sockaddr, socklen_t socklen)
+int bindAddress(int sockfd, const InetAddress& addr)
 {
-    return ::bind(sockfd, sockaddr, socklen);
+    return ::bind(sockfd, addr.getSockAddr(), addr.getSockLen());
 }
 
 int listenSocket(int sockfd)

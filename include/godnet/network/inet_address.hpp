@@ -23,9 +23,9 @@ public:
     InetAddress();
     InetAddress(std::string_view ip, std::uint16_t port);
 
-    std::uint32_t family() const noexcept
+    int family() const noexcept
     {
-        return static_cast<std::uint32_t>(addr_.base.sa_family);
+        return addr_.base.sa_family;
     }
 
     bool isV4() const noexcept
@@ -38,15 +38,30 @@ public:
         return addr_.base.sa_family == AF_INET6;
     }
 
+    const struct sockaddr* getSockAddr() const noexcept
+    {
+        return &addr_.base;
+    }
+
+    struct sockaddr* mutSockAddr() noexcept
+    {
+        return &addr_.base;
+    }
+
+    std::size_t getSockLen() const noexcept 
+    {
+        return isV4() ? sizeof(addr_.v4) : sizeof(addr_.v6);
+    }
+
     std::string ip() const;
     std::uint16_t port() const;
 
 private:
     union
     {
-        sockaddr base;
-        sockaddr_in v4;
-        sockaddr_in6 v6;
+        struct sockaddr base;
+        struct sockaddr_in v4;
+        struct sockaddr_in6 v6;
     } addr_{};
 };
 

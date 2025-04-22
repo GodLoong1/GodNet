@@ -18,14 +18,6 @@ const std::uint32_t EventChannel::NONE_EVENT = 0;
 const std::uint32_t EventChannel::READ_EVENT = EPOLLIN | EPOLLPRI;
 const std::uint32_t EventChannel::WRITE_EVENT = EPOLLOUT;
 
-EventChannel::EventChannel(EventLoop* loop, int fd)
-: loop_(loop),
-  fd_(fd)
-{
-    GODNET_THROW_IF(!loop, "EventLoop is null");
-    GODNET_THROW_IF(fd < 0, "Invalid file descriptor");
-}
-
 EventChannel::~EventChannel()
 {
     GODNET_ASSERT(!is_handling_ && "EventChannel is handling events");
