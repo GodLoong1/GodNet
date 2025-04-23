@@ -1,12 +1,10 @@
 #include "godnet/network/socket_ops.hpp"
 
-#include <asm-generic/socket.h>
 #include <fcntl.h>
 
 #if defined(GODNET_LINUX)
     #include <unistd.h>
-    #include <netinet/tcp.h>
-    #include <cerrno>
+    #include <netinet/in.h>
 #elif defined(GODNET_WIN)
     #include <ws2tcpip.h>
 #endif
@@ -159,6 +157,15 @@ int getSocketError(int sockfd)
 #endif
     }
     return optval;
+}
+
+int socketPair(int family, int type, int protocol, int fds[2])
+{
+#if defined(GODNET_LINUX)
+    return ::socketpair(AF_LOCAL, type, protocol, fds);
+#elif defined(GODNET_WIN)
+
+#endif
 }
 
 }

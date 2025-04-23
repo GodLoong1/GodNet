@@ -1,10 +1,8 @@
 #include "godnet/network/inet_address.hpp"
 
-#include "godnet/util/debug.hpp"
+#include "fmt/format.h"
 
-#if defined(GODNET_LINUX)
-    #include <arpa/inet.h>
-#endif
+#include "godnet/util/debug.hpp"
 
 namespace godnet
 {
@@ -33,32 +31,32 @@ InetAddress::InetAddress(std::string_view ip, std::uint16_t port)
     GODNET_THROW_RUNERR("invalid ip address");
 }
 
-std::string InetAddress::ip() const
+std::string InetAddress::toIp() const noexcept
 {
+    char buffer[INET6_ADDRSTRLEN]{};
     if (isV4())
     {
-        char buffer[INET_ADDRSTRLEN]{};
-        if (::inet_ntop(AF_INET, &addr_.v4.sin_addr, buffer, INET_ADDRSTRLEN) == nullptr)
-        {
-            GODNET_THROW_RUNERR("invalid ip address");
-        }
-        return buffer;
+        ::inet_ntop(AF_INET, &addr_.v4.sin_addr, buffer, sizeof(buffer));
     }
-    char buffer[INET6_ADDRSTRLEN]{};
-    if (::inet_ntop(AF_INET6, &addr_.v6.sin6_addr, buffer, INET6_ADDRSTRLEN) == nullptr)
+    else
     {
-        GODNET_THROW_RUNERR("invalid ip address");
+        ::inet_ntop(AF_INET6, &addr_.v6.sin6_addr, buffer, sizeof(buffer));
     }
     return buffer;
 }
 
-std::uint16_t InetAddress::port() const
+std::uint16_t InetAddress::toPort() const noexcept
 {
     if (isV4())
     {
         return ::ntohs(addr_.v4.sin_port);
     }
     return ::ntohs(addr_.v6.sin6_port);
+}
+
+std::string InetAddress::toIpPort() const noexcept
+{
+    return fmt::format("{}:{}", toIp(), toPort());
 }
 
 }

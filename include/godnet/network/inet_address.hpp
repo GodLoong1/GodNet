@@ -3,16 +3,16 @@
 
 #include "godnet/config.hpp"
 
+#include <string>
+#include <string_view>
+#include <cstdint>
+
 #if defined(GODNET_WIN)
     #include <WinSock2.h>
     #include <ws2tcpip.h>
 #elif defined(GODNET_LINUX)
-    #include <netinet/in.h>
+    #include <arpa/inet.h>
 #endif
-
-#include <string>
-#include <string_view>
-#include <cstdint>
 
 namespace godnet
 {
@@ -53,8 +53,9 @@ public:
         return isV4() ? sizeof(addr_.v4) : sizeof(addr_.v6);
     }
 
-    std::string ip() const;
-    std::uint16_t port() const;
+    std::string toIp() const noexcept;
+    std::uint16_t toPort() const noexcept;
+    std::string toIpPort() const noexcept;
 
 private:
     union

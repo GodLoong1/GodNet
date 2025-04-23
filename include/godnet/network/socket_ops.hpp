@@ -11,29 +11,31 @@ class InetAddress;
 namespace socket_ops
 {
 
-void setNonBlock(int sockfd);
+GODNET_EXPORT void setNonBlock(int sockfd);
 
-int createTcpSocket(int family);
+GODNET_EXPORT int createTcpSocket(int family);
 
-int closeSocket(int sockfd);
+GODNET_EXPORT int closeSocket(int sockfd);
 
-int bindAddress(int sockfd, const InetAddress& addr);
+GODNET_EXPORT int bindAddress(int sockfd, const InetAddress& addr);
 
-int listenSocket(int sockfd);
+GODNET_EXPORT int listenSocket(int sockfd);
 
-int acceptSocket(int sockfd, InetAddress& addr);
+GODNET_EXPORT int acceptSocket(int sockfd, InetAddress& addr);
 
-int closeWrite(int sockfd);
+GODNET_EXPORT int closeWrite(int sockfd);
 
-int setTcpNoDelay(int sockfd, bool on);
+GODNET_EXPORT int setTcpNoDelay(int sockfd, bool on);
 
-int setReuseAddr(int sockfd, bool on);
+GODNET_EXPORT int setReuseAddr(int sockfd, bool on);
 
-int setReusePort(int sockfd, bool on);
+GODNET_EXPORT int setReusePort(int sockfd, bool on);
 
-int setKeepAlive(int sockfd, bool on);
+GODNET_EXPORT int setKeepAlive(int sockfd, bool on);
 
-int getSocketError(int sockfd);
+GODNET_EXPORT int getSocketError(int sockfd);
+
+GODNET_EXPORT int socketPair(int family, int type, int protocol, int fds[2]);
 
 }
 }
