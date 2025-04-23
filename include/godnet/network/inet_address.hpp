@@ -20,8 +20,13 @@ namespace godnet
 class GODNET_EXPORT InetAddress
 {
 public:
-    InetAddress();
-    InetAddress(std::string_view ip, std::uint16_t port);
+    InetAddress(std::uint16_t port = 0,
+                bool loopback = false,
+                bool ipv6 = false) noexcept;
+
+    InetAddress(std::string_view ip,
+                std::uint16_t port,
+                bool ipv6 = false);
 
     int family() const noexcept
     {

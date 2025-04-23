@@ -1,13 +1,17 @@
 #include "godnet/network/socket_ops.hpp"
 
 #include <fcntl.h>
+#include <sys/socket.h>
 
 #if defined(GODNET_LINUX)
     #include <unistd.h>
     #include <netinet/in.h>
+    #include <netinet/tcp.h>
 #elif defined(GODNET_WIN)
     #include <ws2tcpip.h>
 #endif
+
+#include "godnet/network/inet_address.hpp"
 
 namespace godnet::socket_ops
 {
@@ -60,17 +64,46 @@ int listenSocket(int sockfd)
     return ::listen(sockfd, SOMAXCONN);
 }
 
-int acceptSocket(int sockfd, struct sockaddr* sockaddr, socklen_t* socklen)
+int acceptSocket(int sockfd, InetAddress& addr)
 {
+    socklen_t socklen = addr.getSockLen();
 #if defined(GODNET_LINUX)
     return ::accept4(sockfd,
-                     sockaddr,
-                     socklen,
+                     addr.mutSockAddr(),
+                     &socklen,
                      SOCK_NONBLOCK | SOCK_CLOEXEC);
 #elif defined(GODNET_WIN)
     return ::accept(sockfd,
-                    sockaddr,
-                    socklen);
+                    addr.mutSockAddr(),
+                    &socklen);
+#endif
+}
+
+
+int connectSocket(int sockfd, const InetAddress& addr)
+{
+#if defined(GODNET_LINUX)
+    return ::connect(sockfd,
+                     addr.getSockAddr(),
+                     addr.getSockLen());
+#elif defined(GODNET_WIN)
+    return ::connect(sockfd,
+                     addr.getSockAddr(),
+                     addr.getSockLen());
+#endif
+}
+
+int getSocketName(int sockfd, InetAddress& addr)
+{
+    socklen_t socklen = addr.getSockLen();
+#if defined(GODNET_LINUX)
+    return ::getsockname(sockfd,
+                         addr.mutSockAddr(),
+                         &socklen);
+#elif defined(GODNET_WIN)
+    return ::getsockname(sockfd,
+                         addr.mutSockAddr(),
+                         &socklen);
 #endif
 }
 
@@ -159,12 +192,70 @@ int getSocketError(int sockfd)
     return optval;
 }
 
-int socketPair(int family, int type, int protocol, int fds[2])
+int createTcpSocketPair(int family, int fds[2])
 {
+    if (family != AF_INET || family != AF_INET6)
+    {
+        return -1;
+    }
 #if defined(GODNET_LINUX)
-    return ::socketpair(AF_LOCAL, type, protocol, fds);
+    return ::socketpair(family,
+                        SOCK_STREAM | SOCK_NONBLOCK | SOCK_CLOEXEC,
+                        0,
+                        fds);
 #elif defined(GODNET_WIN)
+    int listenfd = -1, connfd = -1, acceptfd = -1;
+    InetAddress localaddr(0, true, family == AF_INET6);
 
+    listenfd = createTcpSocket(family);
+    if (listenfd < 0)
+    {
+        goto error;
+    }
+    if (bindAddress(listenfd, localaddr) < 0)
+    {
+        goto error;
+    }
+    if (listenSocket(listenfd) < 0)
+    {
+        goto error;
+    }
+    if (getSocketName(listenfd, localaddr) < 0)
+    {
+        goto error;
+    }
+    connfd = createTcpSocket(family);
+    if (connfd < 0)
+    {
+        goto error;
+    }
+    if (connectSocket(connfd, localaddr))
+    {
+        goto error;
+    }
+    acceptfd = acceptSocket(listenfd, localaddr);
+    if (acceptfd < 0)
+    {
+        goto error;
+    }
+    closeSocket(listenfd);
+    fds[0] = connfd;
+    fds[1] = acceptfd;
+    return 0;
+error:
+    if (listenfd >= 0)
+    {
+        closeSocket(listenfd);
+    }
+    if (connfd >= 0)
+    {
+        closeSocket(connfd);
+    }
+    if (acceptfd >= 0)
+    {
+        closeSocket(acceptfd);
+    }
+    return -1;
 #endif
 }
 

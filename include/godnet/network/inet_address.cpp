@@ -7,26 +7,45 @@
 namespace godnet
 {
 
-InetAddress::InetAddress()
+InetAddress::InetAddress(std::uint16_t port,
+                         bool loopback,
+                         bool ipv6) noexcept
 {
-    addr_.v4.sin_family = AF_INET;
-    addr_.v4.sin_port = 0;
-    addr_.v4.sin_addr.s_addr = INADDR_ANY;
-}
-
-InetAddress::InetAddress(std::string_view ip, std::uint16_t port)
-{
-    if (::inet_pton(AF_INET, ip.data(), &addr_.v4.sin_addr) == 1)
+    if (ipv6)
+    {
+        addr_.v6.sin6_family = AF_INET;
+        addr_.v6.sin6_port = ::htons(port);
+        addr_.v6.sin6_addr = loopback ? in6addr_loopback : in6addr_any;
+    }
+    else
     {
         addr_.v4.sin_family = AF_INET;
         addr_.v4.sin_port = ::htons(port);
-        return;
+        addr_.v4.sin_addr.s_addr = loopback ? INADDR_LOOPBACK : INADDR_ANY;
     }
-    else if (::inet_pton(AF_INET6, ip.data(), &addr_.v6.sin6_addr) == 1)
+}
+
+InetAddress::InetAddress(std::string_view ip,
+                         std::uint16_t port,
+                         bool ipv6)
+{
+    if (ipv6)
     {
-        addr_.v6.sin6_family = AF_INET6;
-        addr_.v6.sin6_port = ::htons(port);
-        return;
+        if (::inet_pton(AF_INET6, ip.data(), &addr_.v6.sin6_addr) > 0)
+        {
+            addr_.v6.sin6_family = AF_INET6;
+            addr_.v6.sin6_port = ::htons(port);
+            return;
+        }
+    }
+    else
+    {
+        if (::inet_pton(AF_INET, ip.data(), &addr_.v4.sin_addr) > 0)
+        {
+            addr_.v4.sin_family = AF_INET;
+            addr_.v4.sin_port = ::htons(port);
+            return;
+        }
     }
     GODNET_THROW_RUNERR("invalid ip address");
 }

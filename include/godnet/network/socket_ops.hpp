@@ -8,7 +8,9 @@ namespace godnet
 
 class InetAddress;
 
-namespace socket_ops
+}
+
+namespace godnet::socket_ops
 {
 
 GODNET_EXPORT void setNonBlock(int sockfd);
@@ -23,6 +25,10 @@ GODNET_EXPORT int listenSocket(int sockfd);
 
 GODNET_EXPORT int acceptSocket(int sockfd, InetAddress& addr);
 
+GODNET_EXPORT int connectSocket(int sockfd, const InetAddress& addr);
+
+GODNET_EXPORT int getSocketName(int sockfd, InetAddress& addr);
+
 GODNET_EXPORT int closeWrite(int sockfd);
 
 GODNET_EXPORT int setTcpNoDelay(int sockfd, bool on);
@@ -35,9 +41,8 @@ GODNET_EXPORT int setKeepAlive(int sockfd, bool on);
 
 GODNET_EXPORT int getSocketError(int sockfd);
 
-GODNET_EXPORT int socketPair(int family, int type, int protocol, int fds[2]);
+GODNET_EXPORT int createTcpSocketPair(int family, int type, int protocol, int fds[2]);
 
-}
 }
 
 #endif

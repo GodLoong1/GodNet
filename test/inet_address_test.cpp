@@ -3,10 +3,10 @@
 
 int main()
 {
-    godnet::InetAddress addr1("1.15.234.12", 2024);
+    godnet::InetAddress addr1("1.15.234.12", 2024, false);
     fmt::print("addr1: {}\n", addr1.toIpPort());
 
-    godnet::InetAddress addr2("fe80::5054:ff:feda:eec9", 1024);
+    godnet::InetAddress addr2("fe80::5054:ff:feda:eec9", 1024, true);
     fmt::print("addr2: {}\n", addr2.toIpPort());
 
     try
