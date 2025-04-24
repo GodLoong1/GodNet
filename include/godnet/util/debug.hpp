@@ -10,7 +10,7 @@
     throw godnet::RuntimeError(__FILE__, __LINE__, GODNET_FUNCTION, msg)
 
 #define GODNET_THROW_SYSERR(msg) \
-    throw godnet::SystemError(__FILE__, __LINE__, GODNET_FUNTION, msg)
+    throw godnet::SystemError(__FILE__, __LINE__, GODNET_FUNCTION, msg)
 
 #ifndef GODNET_NDEBUG
     #define GODNET_ASSERT(expr) \

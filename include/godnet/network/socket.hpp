@@ -2,21 +2,50 @@
 #define GODNET_NETWORK_SOCKET_HPP
 
 #include "godnet/config.hpp"
-#include "godnet/util/noncopyable.hpp"
 
 namespace godnet
 {
 
-class Socket : Noncopyable
+class InetAddress;
+
+namespace socket
 {
-public:
-    explicit Socket(int sockfd);
-    ~Socket();
 
-private:
-    int sockfd_;
-};
+GODNET_EXPORT void setSocketNonBlock(int sockfd);
 
+GODNET_EXPORT int createTcpSocket(int family);
+
+GODNET_EXPORT int createUdpSocket(int family);
+
+GODNET_EXPORT int closeSocket(int sockfd);
+
+GODNET_EXPORT int bindAddress(int sockfd, const InetAddress& addr);
+
+GODNET_EXPORT int listenSocket(int sockfd);
+
+GODNET_EXPORT int acceptSocket(int sockfd, InetAddress& addr);
+
+GODNET_EXPORT int connectSocket(int sockfd, const InetAddress& addr);
+
+GODNET_EXPORT int getLocalAddr(int sockfd, InetAddress& addr);
+
+GODNET_EXPORT int getPeerAddr(int sockfd, InetAddress& addr);
+
+GODNET_EXPORT int closeWrite(int sockfd);
+
+GODNET_EXPORT int setTcpNoDelay(int sockfd, bool on);
+
+GODNET_EXPORT int setReuseAddr(int sockfd, bool on);
+
+GODNET_EXPORT int setReusePort(int sockfd, bool on);
+
+GODNET_EXPORT int setKeepAlive(int sockfd, bool on);
+
+GODNET_EXPORT int getSocketError(int sockfd);
+
+GODNET_EXPORT int createTcpSocketPair(int family, int type, int protocol, int fds[2]);
+
+}
 }
 
 #endif

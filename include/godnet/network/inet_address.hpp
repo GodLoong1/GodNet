@@ -20,13 +20,20 @@ namespace godnet
 class GODNET_EXPORT InetAddress
 {
 public:
-    InetAddress(std::uint16_t port = 0,
-                bool loopback = false,
-                bool ipv6 = false) noexcept;
+    static InetAddress MakeV4(std::string_view ip, std::uint16_t port);
+    static InetAddress MakeV4Any(std::uint16_t port) noexcept;
+    static InetAddress MakeV4Loopback(std::uint16_t port) noexcept;
+    static InetAddress MakeV6(std::string_view ip, std::uint16_t port);
+    static InetAddress MakeV6Any(std::uint16_t port) noexcept;
+    static InetAddress MakeV6Loopback(std::uint16_t port) noexcept;
+
+    InetAddress(std::uint16_t port,
+                bool loopback,
+                bool ipv6) noexcept;
 
     InetAddress(std::string_view ip,
                 std::uint16_t port,
-                bool ipv6 = false);
+                bool ipv6);
 
     int family() const noexcept
     {
@@ -35,12 +42,12 @@ public:
 
     bool isV4() const noexcept
     {
-        return addr_.base.sa_family == AF_INET;
+        return family() == AF_INET;
     }
 
     bool isV6() const noexcept
     {
-        return addr_.base.sa_family == AF_INET6;
+        return family() == AF_INET6;
     }
 
     const struct sockaddr* getSockAddr() const noexcept
