@@ -3,36 +3,33 @@
 
 #include "godnet/config.hpp"
 
+#include "godnet/network/endpoint.hpp"
 #include "godnet/util/noncopyable.hpp"
 
 namespace godnet
 {
 
-class InetAddress;
-
 class GODNET_EXPORT TcpSocket : Noncopyable
 {
 public:
+    static TcpSocket MakeSocket(int family);
+
     TcpSocket() = default;
-    TcpSocket(int sockfd);
+    explicit TcpSocket(int sockfd);
     TcpSocket(TcpSocket&& other) noexcept;
     TcpSocket& operator=(TcpSocket&& other) noexcept;
     ~TcpSocket();
 
-    void swap(TcpSocket& other) noexcept;
-
-    static int CreateSocket(int family);
-
-    void bind(const InetAddress& localaddr);
+    void bind(const Endpoint& localEndpoint);
     void listen();
-    TcpSocket accept(InetAddress& peeraddr);
+    TcpSocket accept(Endpoint& peerEndpoint);
     void closeWrite();
     void setTcpNoDelay(bool on);
     void setReuseAddr(bool on);
     void setReusePort(bool on);
     void setKeepAlive(bool on);
 
-    int fd() const noexcept
+    int getSockfd() const noexcept
     {
         return sockfd_;
     }

@@ -1,26 +1,32 @@
 #include "godnet/network/tcp_acceptor.hpp"
 
+#include "godnet/network/endpoint.hpp"
 #include "godnet/network/tcp_socket.hpp"
 #include "godnet/network/event_loop.hpp"
 #include "godnet/network/event_channel.hpp"
-#include "godnet/util/debug.hpp"
 
 namespace godnet
 {
 
 TcpAcceptor::TcpAcceptor(EventLoop* loop,
-                         const InetAddress& addr,
+                         const Endpoint& endpoint,
                          bool reuseAddr,
                          bool reusePort)
 : loop_(loop),
-  addr_(addr),
-  socket_(TcpSocket::CreateSocket(addr.family())),
-  channel_(std::make_unique<EventChannel>(loop_, socket_.fd()))
+  endpoint_(endpoint),
+  socket_(TcpSocket::MakeSocket(endpoint.family())),
+  channel_(std::make_unique<EventChannel>(loop_, socket_.getSockfd()))
 {
     socket_.setReuseAddr(reuseAddr);
     socket_.setReusePort(reusePort);
-    socket_.bind(addr_);
+    socket_.bind(endpoint_);
     channel_->setReadCallback([this]() { handleRead(); });
+}
+
+TcpAcceptor::~TcpAcceptor()
+{
+    loop_->assertInLoop();
+    channel_->disableAll();
 }
 
 void TcpAcceptor::listen()
@@ -32,20 +38,11 @@ void TcpAcceptor::listen()
 
 void TcpAcceptor::handleRead()
 {
-    InetAddress peerAddr;
-    int newSockfd = socket_.accept(peerAddr);
-    if (newSockfd >= 0)
+    auto peerAddr{makeEndpointV4()};
+    TcpSocket connSocket = socket_.accept(peerAddr);
+    if (newConnectionCallback_)
     {
-        if (newConnectionCallback_)
-        {
-            newConnectionCallback_(newSockfd, peerAddr);
-        }
-        else
-        {
-        }
-    }
-    else
-    {
+        newConnectionCallback_(std::move(connSocket), peerAddr);
     }
 }
 

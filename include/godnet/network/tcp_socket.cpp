@@ -1,19 +1,21 @@
 #include "godnet/network/tcp_socket.hpp"
 
+#include <utility>
+
 #include "godnet/util/debug.hpp"
 #include "godnet/network/socket.hpp"
 
 namespace godnet
 {
 
-int TcpSocket::CreateSocket(int family)
+TcpSocket TcpSocket::MakeSocket(int family)
 {
     int sockfd = socket::createTcpSocket(family);
     if (sockfd < 0)
     {
-        GODNET_THROW_SYSERR("socket::createSocket failed");
+        GODNET_THROW_RUNERR("socket::createTcpSocket failed");
     }
-    return sockfd;
+    return TcpSocket(sockfd);
 }
 
 TcpSocket::TcpSocket(int sockfd)
@@ -28,12 +30,19 @@ TcpSocket::TcpSocket(int sockfd)
 TcpSocket::TcpSocket(TcpSocket&& other) noexcept
 : TcpSocket()
 {
-    swap(other);
+    if (this != &other)
+    {
+        std::swap(sockfd_, other.sockfd_);
+    }
 }
 
 TcpSocket& TcpSocket::operator=(TcpSocket&& other) noexcept
 {
-
+    if (this != &other)
+    {
+        std::swap(sockfd_, other.sockfd_);
+    }
+    return *this;
 }
 
 TcpSocket::~TcpSocket()
@@ -47,7 +56,7 @@ TcpSocket::~TcpSocket()
     }
 }
 
-void TcpSocket::bind(const InetAddress& localaddr)
+void TcpSocket::bind(const Endpoint& localaddr)
 {
     if (socket::bindAddress(sockfd_, localaddr) < 0)
     {
@@ -63,14 +72,14 @@ void TcpSocket::listen()
     }
 }
 
-int TcpSocket::accept(InetAddress& peeraddr)
+TcpSocket TcpSocket::accept(Endpoint& peerEndpoint)
 {
-    int connfd = socket::acceptSocket(sockfd_, peeraddr);
+    int connfd = socket::acceptSocket(sockfd_, peerEndpoint);
     if (connfd < 0)
     {
         GODNET_THROW_SYSERR("socket::acceptSocket failed");
     }
-    return connfd;
+    return TcpSocket(connfd);
 }
 
 void TcpSocket::closeWrite()

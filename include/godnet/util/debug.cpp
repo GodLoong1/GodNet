@@ -1,9 +1,8 @@
 #include "godnet/util/debug.hpp"
 
-#include "godnet/util/system.hpp"
-
 #include <fmt/format.h>
-#include <system_error>
+
+#include "godnet/util/system.hpp"
 
 namespace godnet
 {

@@ -1,45 +1,15 @@
-#include "godnet/network/inet_address.hpp"
+#include "godnet/network/endpoint.hpp"
 
-#include "fmt/format.h"
+#include "fmt/core.h"
 
 #include "godnet/util/debug.hpp"
 
 namespace godnet
 {
 
-InetAddress InetAddress::MakeV4(std::string_view ip, std::uint16_t port)
-{
-    return InetAddress(ip, port, false);
-}
-
-InetAddress InetAddress::MakeV4Any(std::uint16_t port) noexcept
-{
-    return InetAddress(port, false, false);
-}
-
-InetAddress InetAddress::MakeV4Loopback(std::uint16_t port) noexcept
-{
-    return InetAddress(port, true, false);
-}
-
-InetAddress InetAddress::MakeV6(std::string_view ip, std::uint16_t port)
-{
-    return InetAddress(ip, port, true);
-}
-
-InetAddress InetAddress::MakeV6Any(std::uint16_t port) noexcept
-{
-    return InetAddress(port, false, true);
-}
-
-InetAddress InetAddress::MakeV6Loopback(std::uint16_t port) noexcept
-{
-    return InetAddress(port, true, true);
-}
-
-InetAddress::InetAddress(std::uint16_t port,
-                         bool loopback,
-                         bool ipv6) noexcept
+Endpoint::Endpoint(std::uint16_t port,
+                   bool loopback,
+                   bool ipv6) noexcept
 {
     if (ipv6)
     {
@@ -55,9 +25,9 @@ InetAddress::InetAddress(std::uint16_t port,
     }
 }
 
-InetAddress::InetAddress(std::string_view ip,
-                         std::uint16_t port,
-                         bool ipv6)
+Endpoint::Endpoint(std::string_view ip,
+                   std::uint16_t port,
+                   bool ipv6)
 {
     if (ipv6)
     {
@@ -80,7 +50,7 @@ InetAddress::InetAddress(std::string_view ip,
     GODNET_THROW_RUNERR("invalid ip address");
 }
 
-std::string InetAddress::toIp() const noexcept
+std::string Endpoint::toIp() const noexcept
 {
     char buffer[INET6_ADDRSTRLEN]{};
     if (isV4())
@@ -94,7 +64,7 @@ std::string InetAddress::toIp() const noexcept
     return buffer;
 }
 
-std::uint16_t InetAddress::toPort() const noexcept
+std::uint16_t Endpoint::toPort() const noexcept
 {
     if (isV4())
     {
@@ -103,7 +73,7 @@ std::uint16_t InetAddress::toPort() const noexcept
     return ::ntohs(addr_.v6.sin6_port);
 }
 
-std::string InetAddress::toIpPort() const noexcept
+std::string Endpoint::toIpPort() const noexcept
 {
     return fmt::format("{}:{}", toIp(), toPort());
 }

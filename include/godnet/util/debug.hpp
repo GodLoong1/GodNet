@@ -3,6 +3,7 @@
 
 #include "godnet/config.hpp"
 
+#include <stdexcept>
 #include <system_error>
 #include <cassert>
 
@@ -16,7 +17,7 @@
     #define GODNET_ASSERT(expr) \
         (static_cast<bool>(expr) \
         ? static_cast<void>(0) \
-        : __assert_fail (#expr, __FILE__, __LINE__, GODNET_FUNCTION))
+        : __assert_fail(#expr, __FILE__, __LINE__, GODNET_FUNCTION))
 #else
     #define GODNET_ASSERT(expr) static_cast<void>(0)
 #endif

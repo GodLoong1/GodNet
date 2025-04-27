@@ -6,7 +6,7 @@
 namespace godnet
 {
 
-class InetAddress;
+class Endpoint;
 
 namespace socket
 {
@@ -19,17 +19,17 @@ GODNET_EXPORT int createUdpSocket(int family);
 
 GODNET_EXPORT int closeSocket(int sockfd);
 
-GODNET_EXPORT int bindAddress(int sockfd, const InetAddress& addr);
+GODNET_EXPORT int bindAddress(int sockfd, const Endpoint& endpoint);
 
 GODNET_EXPORT int listenSocket(int sockfd);
 
-GODNET_EXPORT int acceptSocket(int sockfd, InetAddress& addr);
+GODNET_EXPORT int acceptSocket(int sockfd, Endpoint& endpoint);
 
-GODNET_EXPORT int connectSocket(int sockfd, const InetAddress& addr);
+GODNET_EXPORT int connectSocket(int sockfd, const Endpoint& endpoint);
 
-GODNET_EXPORT int getLocalAddr(int sockfd, InetAddress& addr);
+GODNET_EXPORT int getLocalAddr(int sockfd, Endpoint& addr);
 
-GODNET_EXPORT int getPeerAddr(int sockfd, InetAddress& addr);
+GODNET_EXPORT int getPeerAddr(int sockfd, Endpoint& addr);
 
 GODNET_EXPORT int closeWrite(int sockfd);
 

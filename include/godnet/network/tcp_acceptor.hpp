@@ -2,12 +2,13 @@
 #define GODNET_NETWORK_TCP_ACCEPTOR_HPP
 
 #include "godnet/config.hpp"
-#include "godnet/util/noncopyable.hpp"
-#include "godnet/network/tcp_socket.hpp"
-#include "godnet/network/inet_address.hpp"
 
 #include <functional>
 #include <memory>
+
+#include "godnet/util/noncopyable.hpp"
+#include "godnet/network/tcp_socket.hpp"
+#include "godnet/network/endpoint.hpp"
 
 namespace godnet
 {
@@ -18,28 +19,34 @@ class EventChannel;
 class GODNET_EXPORT TcpAcceptor : Noncopyable
 {
 public:
-    using NewConnectionCallback = std::function<void(TcpSocket, const InetAddress&)>;
-    using AcceptorSockOptCallback = std::function<void(TcpSocket)>;
+    using NewConnectionCallback = std::function<void(TcpSocket, const Endpoint&)>;
 
     TcpAcceptor(EventLoop* loop,
-                const InetAddress& addr,
+                const Endpoint& endpoint,
                 bool reuseAddr = true,
                 bool reusePort = true);
     ~TcpAcceptor();
 
     void listen();
 
+    void setNewConnectionCallback(const NewConnectionCallback& cb)
+    {
+        newConnectionCallback_ = cb;
+    }
+
+    void setNewConnectionCallback(NewConnectionCallback&& cb) noexcept
+    {
+        newConnectionCallback_ = std::move(cb);
+    }
+
 private:
     void handleRead();
 
-    EventLoop* const loop_;
-    const InetAddress addr_;
+    EventLoop* loop_;
+    Endpoint endpoint_;
     TcpSocket socket_;
     std::unique_ptr<EventChannel> channel_;
     NewConnectionCallback newConnectionCallback_;
-#if defined(GODNET_LINUX)
-    int idleFd_{};
-#endif
 };
 
 }

@@ -11,7 +11,7 @@
     #include <ws2tcpip.h>
 #endif
 
-#include "godnet/network/inet_address.hpp"
+#include "godnet/network/endpoint.hpp"
 
 namespace godnet::socket
 {
@@ -77,9 +77,9 @@ int closeSocket(int sockfd)
 #endif
 }
 
-int bindAddress(int sockfd, const InetAddress& addr)
+int bindAddress(int sockfd, const Endpoint& endpoint)
 {
-    return ::bind(sockfd, addr.getSockAddr(), addr.getSockLen());
+    return ::bind(sockfd, endpoint.getSockAddr(), endpoint.getSockLen());
 }
 
 int listenSocket(int sockfd)
@@ -87,12 +87,12 @@ int listenSocket(int sockfd)
     return ::listen(sockfd, SOMAXCONN);
 }
 
-int acceptSocket(int sockfd, InetAddress& addr)
+int acceptSocket(int sockfd, Endpoint& endpoint)
 {
-    socklen_t socklen = addr.getSockLen();
+    socklen_t socklen = endpoint.getSockLen();
 #if defined(GODNET_LINUX)
     return ::accept4(sockfd,
-                     addr.mutSockAddr(),
+                     endpoint.mutSockAddr(),
                      &socklen,
                      SOCK_NONBLOCK | SOCK_CLOEXEC);
 #elif defined(GODNET_WIN)
@@ -103,12 +103,12 @@ int acceptSocket(int sockfd, InetAddress& addr)
 }
 
 
-int connectSocket(int sockfd, const InetAddress& addr)
+int connectSocket(int sockfd, const Endpoint& endpoint)
 {
 #if defined(GODNET_LINUX)
     return ::connect(sockfd,
-                     addr.getSockAddr(),
-                     addr.getSockLen());
+                     endpoint.getSockAddr(),
+                     endpoint.getSockLen());
 #elif defined(GODNET_WIN)
     return ::connect(sockfd,
                      addr.getSockAddr(),
@@ -116,19 +116,19 @@ int connectSocket(int sockfd, const InetAddress& addr)
 #endif
 }
 
-int getLocalAddr(int sockfd, InetAddress& addr)
+int getLocalAddr(int sockfd, Endpoint& endpoint)
 {
-    socklen_t socklen = addr.getSockLen();
+    socklen_t socklen = endpoint.getSockLen();
     return ::getsockname(sockfd,
-                         addr.mutSockAddr(),
+                         endpoint.mutSockAddr(),
                          &socklen);
 }
 
-int getPeerAddr(int sockfd, InetAddress& addr)
+int getPeerAddr(int sockfd, Endpoint& endpoint)
 {
-    socklen_t socklen = addr.getSockLen();
+    socklen_t socklen = endpoint.getSockLen();
     return ::getpeername(sockfd,
-                         addr.mutSockAddr(),
+                         endpoint.mutSockAddr(),
                          &socklen);
 }
 
