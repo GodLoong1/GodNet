@@ -4,7 +4,6 @@
 #include "godnet/config.hpp"
 #include "godnet/util/noncopyable.hpp"
 
-#include <cstdint>
 #include <vector>
 #include <unordered_set>
 
@@ -14,7 +13,7 @@ namespace godnet
 {
 
 class EventLoop;
-class EventChannel;
+class ChannelEvent;
 
 class GODNET_EXPORT EventPoller : Noncopyable
 {
@@ -22,11 +21,11 @@ public:
     explicit EventPoller(EventLoop* loop);
     ~EventPoller();
 
-    void poll(std::vector<EventChannel*>& readyChannels, int timeout = -1);
-    void update(EventChannel* channel);
+    void poll(std::vector<ChannelEvent*>& readyChannels, int timeout = -1);
+    void update(ChannelEvent* channel);
 
 private:
-    void ctl(int op, EventChannel* channel);
+    void ctl(int op, ChannelEvent* channel);
 
     EventLoop* loop_;
 #if defined(GODNET_LINUX)
@@ -35,7 +34,7 @@ private:
     void* epoll_fd_;
 #endif
     std::vector<struct epoll_event> events_;
-    std::unordered_set<EventChannel*> channels_;
+    std::unordered_set<ChannelEvent*> channels_;
 };
 
 }

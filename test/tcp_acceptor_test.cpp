@@ -1,7 +1,7 @@
 #include "godnet/network/endpoint.hpp"
 #include "godnet/network/tcp_acceptor.hpp"
 #include "godnet/network/event_loop.hpp"
-#include "godnet/network/event_channel.hpp"
+#include "godnet/network/event_base.hpp"
 #include "godnet/network/event_poller.hpp"
 #include "fmt/core.h"
 

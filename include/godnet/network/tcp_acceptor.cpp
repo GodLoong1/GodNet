@@ -3,7 +3,7 @@
 #include "godnet/network/endpoint.hpp"
 #include "godnet/network/tcp_socket.hpp"
 #include "godnet/network/event_loop.hpp"
-#include "godnet/network/event_channel.hpp"
+#include "godnet/network/event_base.hpp"
 
 namespace godnet
 {
@@ -15,7 +15,7 @@ TcpAcceptor::TcpAcceptor(EventLoop* loop,
 : loop_(loop),
   endpoint_(endpoint),
   socket_(TcpSocket::MakeSocket(endpoint.family())),
-  channel_(std::make_unique<EventChannel>(loop_, socket_.getSockfd()))
+  channel_(std::make_unique<ChannelEvent>(loop_, socket_.getSockfd()))
 {
     socket_.setReuseAddr(reuseAddr);
     socket_.setReusePort(reusePort);

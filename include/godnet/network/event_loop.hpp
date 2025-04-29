@@ -10,12 +10,13 @@
 #include <memory>
 #include <functional>
 #include <type_traits>
+#include <queue>
 
 namespace godnet
 {
 
 class EventPoller;
-class EventChannel;
+class ChannelEvent;
 
 class GODNET_EXPORT EventLoop : Noncopyable
 {
@@ -48,7 +49,7 @@ public:
     bool isInLoop() const noexcept;
     void assertInLoop();
 
-    void updateChannel(EventChannel* channel);
+    void updateChannel(ChannelEvent* channel);
 
 private:
     void wakeup();
@@ -58,11 +59,12 @@ private:
     std::uint64_t thread_id_{};
 
     std::unique_ptr<EventPoller> poller_{};
-    std::vector<EventChannel*> ready_channel_vec_{};
+    std::vector<ChannelEvent*> ready_channel_vec_{};
     LockFreeQueue<EventCallback> event_callback_queue_{};
+    std::priority_queue<ChannelEvent*> timer_queue_{};
 
     int wakeup_fd_{};
-    std::unique_ptr<EventChannel> wakeup_channel_{};
+    std::unique_ptr<ChannelEvent> wakeup_channel_{};
 };
 
 }

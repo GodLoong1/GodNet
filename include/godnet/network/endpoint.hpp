@@ -3,16 +3,16 @@
 
 #include "godnet/config.hpp"
 
-#include <string>
-#include <string_view>
-#include <cstdint>
-
 #if defined(GODNET_WIN)
     #include <WinSock2.h>
     #include <ws2tcpip.h>
 #elif defined(GODNET_LINUX)
     #include <arpa/inet.h>
 #endif
+
+#include <string>
+#include <string_view>
+#include <cstdint>
 
 namespace godnet
 {

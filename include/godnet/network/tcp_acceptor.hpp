@@ -14,7 +14,7 @@ namespace godnet
 {
 
 class EventLoop;
-class EventChannel;
+class ChannelEvent;
 
 class GODNET_EXPORT TcpAcceptor : Noncopyable
 {
@@ -45,7 +45,7 @@ private:
     EventLoop* loop_;
     Endpoint endpoint_;
     TcpSocket socket_;
-    std::unique_ptr<EventChannel> channel_;
+    std::unique_ptr<ChannelEvent> channel_;
     NewConnectionCallback newConnectionCallback_;
 };
 

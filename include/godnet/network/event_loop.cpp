@@ -3,7 +3,7 @@
 #include "godnet/util/debug.hpp"
 #include "godnet/util/system.hpp"
 
-#include "godnet/network/event_channel.hpp"
+#include "godnet/network/event_base.hpp"
 #include "godnet/network/event_poller.hpp"
 #include <atomic>
 
@@ -33,7 +33,7 @@ EventLoop::EventLoop()
     {
         GODNET_THROW_RUNERR("eventfd() failed");
     }
-    wakeup_channel_ = std::make_unique<EventChannel>(this, wakeup_fd_);
+    wakeup_channel_ = std::make_unique<ChannelEvent>(this, wakeup_fd_);
     wakeup_channel_->setReadCallback([this] {
         uint64_t val{};
         if (::read(wakeup_fd_, &val, sizeof(val)) < 0)
@@ -106,7 +106,7 @@ void EventLoop::assertInLoop()
     }
 }
 
-void EventLoop::updateChannel(EventChannel* channel)
+void EventLoop::updateChannel(ChannelEvent* channel)
 {
     poller_->update(channel);
 }

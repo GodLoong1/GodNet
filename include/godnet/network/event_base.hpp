@@ -1,31 +1,156 @@
-#ifndef GODNET_NETWORK_EVENT_CHANNEL_HPP
-#define GODNET_NETWORK_EVENT_CHANNEL_HPP
+#ifndef GODNET_NETWORK_EVENT_BASE_HPP
+#define GODNET_NETWORK_EVENT_BASE_HPP
 
 #include "godnet/config.hpp"
-#include "godnet/util/noncopyable.hpp"
 
 #include <cstdint>
 #include <functional>
+#include <chrono>
 #include <memory>
 
 namespace godnet
 {
 
+using EventCallback = std::function<void()>;
+using SteadyTimerPoint = std::chrono::steady_clock::time_point;
+using SystemTimerPoint = std::chrono::system_clock::time_point;
+using TimerInterval = std::chrono::microseconds;
+
 class EventLoop;
 
-class GODNET_EXPORT EventChannel : Noncopyable
+enum class GODNET_EXPORT EventType : std::uint8_t
+{
+    CUSTOM = 1,
+    IDLE,
+    CHANNEL,
+    STEADY_TIMER,
+    SYSTEM_TIMER,
+    SIGNAL,
+};
+
+class GODNET_EXPORT EventId
+{
+public:
+    EventId(EventType type, std::uint64_t count) noexcept
+    {
+        id_ = (static_cast<std::uint64_t>(type) << 56) | (count & 0x00FFFFFFFFFFFFFF);
+    }
+
+    EventType eventType() const noexcept
+    {
+        return static_cast<EventType>((id_ >> 56) & 0xFF);
+    }
+
+    std::uint64_t count() const noexcept
+    {
+        return id_ & 0x00FFFFFFFFFFFFFF;
+    }
+
+    std::uint64_t id() const noexcept
+    {
+        return id_;
+    }
+
+    operator std::uint64_t() const noexcept
+    {
+        return id_;
+    }
+
+    static EventId GenerateEventId(EventType type);
+
+private:
+    std::uint64_t id_;
+};
+
+class GODNET_EXPORT EventBase
+{
+public:
+    explicit EventBase(EventType type) noexcept
+    : type_(type) {}
+
+    EventType getEventType() const noexcept
+    {
+        return type_;
+    }
+
+private:
+    EventType type_;
+};
+
+class GODNET_EXPORT CustomEvent : public EventBase
+{
+public:
+    explicit CustomEvent(EventCallback&& callback) noexcept
+    : EventBase(EventType::CUSTOM), callback_(std::move(callback)) {}
+
+private:
+    EventCallback callback_;
+};
+
+class GODNET_EXPORT IdleEvent : public EventBase
+{
+public:
+    explicit IdleEvent(EventCallback&& callback) noexcept
+    : EventBase(EventType::IDLE), callback_(std::move(callback)) {}
+
+private:
+    EventCallback callback_;
+};
+
+class GODNET_EXPORT SignalEvent : public EventBase
+{
+    explicit SignalEvent(EventCallback&& callback) noexcept
+    : EventBase(EventType::SIGNAL), callback_(std::move(callback)) {}
+
+private:
+    EventCallback callback_;
+};
+
+class GODNET_EXPORT SteadyTimerEvent : public EventBase
+{
+public:
+    SteadyTimerEvent(EventCallback&& callback,
+                     const SteadyTimerPoint& expiration,
+                     const TimerInterval& interval) noexcept
+    : EventBase(EventType::STEADY_TIMER),
+      callback_(std::move(callback)),
+      expiration_(expiration),
+      interval_(interval) {}
+
+private:
+    EventCallback callback_;
+    SteadyTimerPoint expiration_;
+    TimerInterval interval_;
+};
+
+class GODNET_EXPORT SystemTimerEvent : public EventBase
+{
+public:
+    SystemTimerEvent(EventCallback&& callback,
+                     const SystemTimerPoint& expiration,
+                     const TimerInterval& interval) noexcept
+    : EventBase(EventType::SYSTEM_TIMER),
+      callback_(std::move(callback)),
+      expiration_(expiration),
+      interval_(interval) {}
+
+private:
+    EventCallback callback_;
+    SystemTimerPoint expiration_;
+    TimerInterval interval_;
+};
+
+class GODNET_EXPORT ChannelEvent : EventBase
 {
 public:
     static const std::uint32_t NONE_EVENT;
     static const std::uint32_t READ_EVENT;
     static const std::uint32_t WRITE_EVENT;
 
-    using EventCallback = std::function<void()>;
+    ChannelEvent(EventLoop* loop, int fd)
+    : EventBase(EventType::CHANNEL), loop_(loop), fd_(fd) { }
 
-    EventChannel(EventLoop* loop, int fd)
-    : loop_(loop), fd_(fd) { }
-
-    ~EventChannel();
+    ~ChannelEvent();
 
     void setReadCallback(EventCallback&& callback) noexcept
     {
@@ -165,8 +290,8 @@ public:
 private:
     void handlerEventSafe();
 
-    EventLoop* const loop_{};
-    const int fd_{};
+    EventLoop* loop_{};
+    int fd_{};
     std::uint32_t events_{};
     std::uint32_t revents_{};
 
@@ -180,6 +305,7 @@ private:
     bool is_handling_{};
     std::weak_ptr<void> object_handler_{};
 };
+
 
 }
 

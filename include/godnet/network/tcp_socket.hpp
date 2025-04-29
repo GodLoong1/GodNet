@@ -24,6 +24,7 @@ public:
     void listen();
     TcpSocket accept(Endpoint& peerEndpoint);
     void closeWrite();
+
     void setTcpNoDelay(bool on);
     void setReuseAddr(bool on);
     void setReusePort(bool on);
