@@ -55,11 +55,11 @@ std::string Endpoint::toIp() const noexcept
     char buffer[INET6_ADDRSTRLEN]{};
     if (isV4())
     {
-        ::inet_ntop(AF_INET, &addr_.v4.sin_addr, buffer, sizeof(buffer));
+        ::inet_ntop(family(), &addr_.v4.sin_addr, buffer, sizeof(buffer));
     }
     else
     {
-        ::inet_ntop(AF_INET6, &addr_.v6.sin6_addr, buffer, sizeof(buffer));
+        ::inet_ntop(family(), &addr_.v6.sin6_addr, buffer, sizeof(buffer));
     }
     return buffer;
 }
