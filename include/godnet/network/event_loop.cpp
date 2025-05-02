@@ -1,11 +1,13 @@
 #include "godnet/network/event_loop.hpp"
 
+#include <atomic>
+#include <csignal>
+
 #include "godnet/util/debug.hpp"
 #include "godnet/util/system.hpp"
 
 #include "godnet/network/event_base.hpp"
 #include "godnet/network/event_poller.hpp"
-#include <atomic>
 
 #if defined(GODNET_LINUX)
     #include <sys/eventfd.h>
@@ -91,6 +93,34 @@ void EventLoop::quit()
     {
         wakeup();
     }
+}
+
+SignalEventId EventLoop::addSiganlEvent(EventCallback&& callback, int signo)
+{
+    assertInLoop();
+
+#if defined(GODNET_LINUX)
+    constexpr std::size_t maxSigno = _NSIG;
+#elif defined(GODNET_WIN)
+    constexpr std::size_t maxSigno = 64;
+#endif
+    if (signo < 0 || signo >= maxSigno)
+    {
+        return INVALID_EVENT_ID;
+    }
+    if (signalEvents_.size() != maxSigno)
+    {
+        signalEvents_.resize(64);
+    }
+    if (signalEvents_[signo].getEventType())
+    {
+
+    }
+}
+
+bool EventLoop::delSignalEvent(SignalEventId eventId)
+{
+
 }
 
 bool EventLoop::isInLoop() const noexcept

@@ -9,13 +9,16 @@
 namespace godnet
 {
 
+class SteadyTimerEvent;
+class SystemTimerEvent;
+
 class GODNET_EXPORT TimerQueue
 {
 public:
 
 private:
-    std::priority_queue<TimerPtr, TimerPtrVec, std::greater<TimerPtr>> timers_;
-    std::unordered_set<int> cancelIds_;
+    std::priority_queue<SteadyTimerEvent> timers_;
+    std::unordered_set<int> cancelEventIds_;
 };
 
 }

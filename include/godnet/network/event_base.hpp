@@ -11,133 +11,114 @@
 namespace godnet
 {
 
-using EventCallback = std::function<void()>;
-using SteadyTimerPoint = std::chrono::steady_clock::time_point;
-using SystemTimerPoint = std::chrono::system_clock::time_point;
-using TimerInterval = std::chrono::microseconds;
-
-class EventLoop;
-
 enum class GODNET_EXPORT EventType : std::uint8_t
 {
-    CUSTOM = 1,
-    IDLE,
+    IDLE = 0,
+    CUSTOM,
     CHANNEL,
-    STEADY_TIMER,
-    SYSTEM_TIMER,
+    TIMER,
     SIGNAL,
 };
 
-class GODNET_EXPORT EventId
-{
-public:
-    EventId(EventType type, std::uint64_t count) noexcept
-    {
-        id_ = (static_cast<std::uint64_t>(type) << 56) | (count & 0x00FFFFFFFFFFFFFF);
-    }
-
-    EventType eventType() const noexcept
-    {
-        return static_cast<EventType>((id_ >> 56) & 0xFF);
-    }
-
-    std::uint64_t count() const noexcept
-    {
-        return id_ & 0x00FFFFFFFFFFFFFF;
-    }
-
-    std::uint64_t id() const noexcept
-    {
-        return id_;
-    }
-
-    operator std::uint64_t() const noexcept
-    {
-        return id_;
-    }
-
-    static EventId GenerateEventId(EventType type);
-
-private:
-    std::uint64_t id_;
-};
+class EventLoop;
+class EventBase;
+using EventId = std::uint64_t;
 
 class GODNET_EXPORT EventBase
 {
 public:
-    explicit EventBase(EventType type) noexcept
-    : type_(type) {}
+    EventBase(EventLoop* loop,
+              EventType type) noexcept
+    : loop_(loop), type_(type) {}
 
     EventType getEventType() const noexcept
     {
         return type_;
     }
 
+    EventLoop* loop() const noexcept
+    {
+        return loop_;
+    }
+
+    EventType type() const noexcept
+    {
+        return type_;
+    }
+
+    bool destroy() const noexcept
+    {
+        return destroy_;
+    }
+
+    void destroy(bool destroy) noexcept
+    {
+        destroy_ = destroy;
+    }
+
+    bool active() const noexcept
+    {
+        return active_;
+    }
+
+    void active(bool active) noexcept
+    {
+        active_ = active;
+    }
+
+    bool pending() const noexcept
+    {
+        return pending_;
+    }
+
+    void pending(bool pending) noexcept
+    {
+        pending_ = pending;
+    }
+
+    EventBase* pendingNext() const noexcept
+    {
+        return pendingNext_;
+    }
+
 private:
+    EventLoop* loop_;
     EventType type_;
+    bool destroy_;
+    bool active_;
+    bool pending_;
+    EventBase* pendingNext_{};
 };
 
-class GODNET_EXPORT CustomEvent : public EventBase
-{
-public:
-    explicit CustomEvent(EventCallback&& callback) noexcept
-    : EventBase(EventType::CUSTOM), callback_(std::move(callback)) {}
-
-private:
-    EventCallback callback_;
-};
+class IdleEvent;
+using IdleEventCallback = std::function<void(IdleEvent*)>;
 
 class GODNET_EXPORT IdleEvent : public EventBase
 {
 public:
-    explicit IdleEvent(EventCallback&& callback) noexcept
-    : EventBase(EventType::IDLE), callback_(std::move(callback)) {}
+    IdleEvent(EventLoop* loop,
+              EventId eventId,
+              IdleEventCallback&& callback) noexcept
+    : EventBase(loop, EventType::IDLE),
+      eventId_(eventId),
+      callback_(std::move(callback)) {}
 
 private:
-    EventCallback callback_;
+    EventId eventId_;
+    IdleEventCallback callback_;
 };
 
-class GODNET_EXPORT SignalEvent : public EventBase
-{
-    explicit SignalEvent(EventCallback&& callback) noexcept
-    : EventBase(EventType::SIGNAL), callback_(std::move(callback)) {}
+class CustomEvent;
+using CustomEventCallback = std::function<void(CustomEvent*)>;
 
-private:
-    EventCallback callback_;
-};
-
-class GODNET_EXPORT SteadyTimerEvent : public EventBase
-{
-public:
-    SteadyTimerEvent(EventCallback&& callback,
-                     const SteadyTimerPoint& expiration,
-                     const TimerInterval& interval) noexcept
-    : EventBase(EventType::STEADY_TIMER),
-      callback_(std::move(callback)),
-      expiration_(expiration),
-      interval_(interval) {}
-
-private:
-    EventCallback callback_;
-    SteadyTimerPoint expiration_;
-    TimerInterval interval_;
-};
-
-class GODNET_EXPORT SystemTimerEvent : public EventBase
+class GODNET_EXPORT CustomEvent : public EventBase
 {
 public:
-    SystemTimerEvent(EventCallback&& callback,
-                     const SystemTimerPoint& expiration,
-                     const TimerInterval& interval) noexcept
-    : EventBase(EventType::SYSTEM_TIMER),
-      callback_(std::move(callback)),
-      expiration_(expiration),
-      interval_(interval) {}
+    explicit CustomEvent(EventLoop* loop, EventId id, CustomEventCallback&& callback) noexcept
+    : EventBase(loop, EventType::CUSTOM, id), callback_(std::move(callback)) {}
 
 private:
-    EventCallback callback_;
-    SystemTimerPoint expiration_;
-    TimerInterval interval_;
+    CustomEventCallback callback_;
 };
 
 class GODNET_EXPORT ChannelEvent : EventBase

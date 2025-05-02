@@ -4,6 +4,7 @@
 #include "godnet/config.hpp"
 #include "godnet/util/noncopyable.hpp"
 #include "godnet/util/lock_free_queue.hpp"
+#include "godnet/network/event_base.hpp"
 
 #include <cstdint>
 #include <atomic>
@@ -28,6 +29,9 @@ public:
 
     void loop();
     void quit();
+
+    SignalEventId addSiganlEvent(EventCallback&& callback, int signo);
+    bool delSignalEvent(SignalEventId eventId);
 
     template <typename Func, typename =
         std::enable_if_t<std::is_constructible_v<EventCallback, Func>>>
@@ -54,17 +58,30 @@ public:
 private:
     void wakeup();
 
-    std::atomic<bool> looping_{};
-    std::atomic<bool> quit_{};
-    std::uint64_t thread_id_{};
+    enum class Status : std::uint8_t
+    {
+        STOP,
+        RUNNING,
+    };
+
+    std::atomic<Status> status_{Status::STOP};
+    std::uint64_t threadId_{};
+    std::uint64_t startTimeMs_{};
+    std::uint64_t startTimeUs_{};
+    std::uint64_t curTimeUs_{};
+
+    std::vector<SignalEvent*> signalEvents_{};
+    std::unordered_map<SignalEventId, SignalEvent*> signalEventIds_{};
 
     std::unique_ptr<EventPoller> poller_{};
     std::vector<ChannelEvent*> ready_channel_vec_{};
     LockFreeQueue<EventCallback> event_callback_queue_{};
     std::priority_queue<ChannelEvent*> timer_queue_{};
 
-    int wakeup_fd_{};
-    std::unique_ptr<ChannelEvent> wakeup_channel_{};
+    // 自定义事件
+    int wakeupFds_[2];
+    std::unique_ptr<ChannelEvent> wakeupChannel_;
+    LockFreeQueue<CustomEvent> customEvents_{};
 };
 
 }
