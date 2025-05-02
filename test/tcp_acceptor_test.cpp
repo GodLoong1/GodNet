@@ -1,8 +1,8 @@
 #include "godnet/network/endpoint.hpp"
 #include "godnet/network/tcp_acceptor.hpp"
 #include "godnet/network/event_loop.hpp"
-#include "godnet/network/event_base.hpp"
 #include "godnet/network/event_poller.hpp"
+#include "godnet/network/event_channel.hpp"
 #include "fmt/core.h"
 
 int main()
@@ -14,5 +14,5 @@ int main()
         fmt::print("New connection from {}\n", endpoint.toIpPort());
     });
     acceptor.listen();
-    loop.loop();
+    loop.start();
 }

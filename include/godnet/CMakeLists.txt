@@ -4,7 +4,7 @@ set(GODNET_SRC
     util/system.cpp
 
     network/endpoint.cpp
-    network/event_base.cpp
+    network/event_channel.cpp
     network/event_loop.cpp
     network/event_poller.cpp
     network/socket.cpp

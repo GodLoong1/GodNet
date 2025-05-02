@@ -2,7 +2,7 @@
 
 #include "godnet/util/debug.hpp"
 #include "godnet/network/event_loop.hpp"
-#include "godnet/network/event_base.hpp"
+#include "godnet/network/event_channel.hpp"
 
 #if defined(GODNET_WIN)
     #include "wepoll.h"
@@ -33,9 +33,9 @@ EventPoller::~EventPoller()
     }
 }
 
-void EventPoller::poll(std::vector<ChannelEvent*>& readyChannels, int timeout)
+void EventPoller::pollEvents(std::vector<EventChannel*>& readyChannels, int timeout)
 {
-    loop_->assertInLoop();
+    loop_->assertInLoopThread();
 
     int ready = ::epoll_wait(epoll_fd_, events_.data(), static_cast<int>(events_.size()), timeout);
     if (ready > 0)
@@ -48,7 +48,7 @@ void EventPoller::poll(std::vector<ChannelEvent*>& readyChannels, int timeout)
         for (std::size_t i = 0; i != static_cast<std::size_t>(ready); ++i)
         {
             auto& ev = events_[i];
-            auto* channel = static_cast<ChannelEvent*>(ev.data.ptr);
+            auto* channel = static_cast<EventChannel*>(ev.data.ptr);
 
             channel->setRevents(ev.events);
             readyChannels.emplace_back(channel);
@@ -60,9 +60,9 @@ void EventPoller::poll(std::vector<ChannelEvent*>& readyChannels, int timeout)
     }
 }
 
-void EventPoller::update(ChannelEvent* channel)
+void EventPoller::updateChannel(EventChannel* channel)
 {
-    loop_->assertInLoop();
+    loop_->assertInLoopThread();
 
     if (channels_.find(channel) != channels_.end())
     {
@@ -83,16 +83,13 @@ void EventPoller::update(ChannelEvent* channel)
     }
 }
 
-void EventPoller::ctl(int op, ChannelEvent* channel)
+void EventPoller::ctl(int op, EventChannel* channel)
 {
     struct epoll_event ev;
     ev.data.ptr = channel;
-    ev.events = channel->getEvents();
+    ev.events = channel->events();
 
-    if (::epoll_ctl(epoll_fd_, op, channel->getFd(), &ev) < 0)
-    {
-        GODNET_THROW_RUNERR("epoll_ctl error");
-    }
+    ::epoll_ctl(epoll_fd_, op, channel->fd(), &ev);
 }
 
 }

@@ -21,5 +21,5 @@ int main()
     loop.queueInLoop([]{
         std::cout << "Hello, World!" << std::endl;
     });
-    loop.loop();
+    loop.start();
 }

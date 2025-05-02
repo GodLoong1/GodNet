@@ -6,7 +6,7 @@
 #include "godnet/util/debug.hpp"
 #include "godnet/util/system.hpp"
 
-#include "godnet/network/event_base.hpp"
+#include "godnet/network/event_channel.hpp"
 #include "godnet/network/event_poller.hpp"
 
 #if defined(GODNET_LINUX)
@@ -19,66 +19,72 @@
 namespace godnet
 {
 
-thread_local EventLoop* current_thread_loop{};
+thread_local EventLoop* currentThreadLoop{};
 
 EventLoop::EventLoop()
-: thread_id_(system::getThreadId()),
+: threadId_(system::getThreadId()),
   poller_(std::make_unique<EventPoller>(this))
 {
-    if (current_thread_loop)
+    if (currentThreadLoop)
     {
-        GODNET_THROW_RUNERR("EventLoop already exists in this thread");
+        GODNET_THROW_RUNERR("EventLoop is already created in this thread");
     }
-    current_thread_loop = this;
+    currentThreadLoop = this;
 
-    if ((wakeup_fd_ = ::eventfd(0, EFD_NONBLOCK | EFD_CLOEXEC)) < 0)
+#if defined(GODNET_LINUX)
+    if ((wakeupFds_[0] = ::eventfd(0, EFD_NONBLOCK | EFD_CLOEXEC)) < 0)
     {
         GODNET_THROW_RUNERR("eventfd() failed");
     }
-    wakeup_channel_ = std::make_unique<ChannelEvent>(this, wakeup_fd_);
-    wakeup_channel_->setReadCallback([this] {
-        uint64_t val{};
-        if (::read(wakeup_fd_, &val, sizeof(val)) < 0)
-        {
-            GODNET_THROW_RUNERR("read() failed");
-        }
+    wakeupChannel_ = std::make_unique<EventChannel>(this, wakeupFds_[0]);
+    wakeupChannel_->setReadCallback([this] {
+        std::uint64_t val{};
+        ::read(wakeupFds_[0], &val, sizeof(val));
     });
-    wakeup_channel_->enableReading();
+    wakeupChannel_->enableReading();
+#elif defined(GODNET_WIN)
+    // TODO
+#endif
 }
 
 EventLoop::~EventLoop()
 {
+    assertInLoopThread();
+
 #if defined(GODNET_LINUX)
-    close(wakeup_fd_);
+    ::close(wakeupFds_[0]);
+    wakeupChannel_->disableAll();
+#elif defined(GODNET_WIN)
+    // TODO
 #endif
-    current_thread_loop = nullptr;
+    currentThreadLoop = nullptr;
 }
 
-void EventLoop::loop()
+void EventLoop::start()
 {
-    assertInLoop();
-    if (looping_)
+    assertInLoopThread();
+
+    if (status_.load(std::memory_order_acquire) == Status::RUNNING)
     {
-        GODNET_THROW_RUNERR("EventLoop is already looping");
+        GODNET_THROW_RUNERR("EventLoop is already started");
     }
-    looping_.store(true, std::memory_order_release);
-    quit_.store(false, std::memory_order_release);
+    status_.store(Status::RUNNING, std::memory_order_release);
 
-    while (!quit_.load(std::memory_order_acquire))
+    while (status_.load(std::memory_order_acquire) == Status::RUNNING)
     {
-        ready_channel_vec_.clear();
-        poller_->poll(ready_channel_vec_);
-
-        for (auto* channel : ready_channel_vec_)
+        // FD事件
+        channels_.clear();
+        poller_->pollEvents(channels_, -1);
+        for (auto* channel : channels_)
         {
             channel->handlerEvent();
         }
 
-        // 在循环中插入队列
-        while (!event_callback_queue_.empty())
+        // 处理自定义事件
+        while (!customEvents_.empty())
         {
             EventCallback cb;
-            while (event_callback_queue_.dequeue(cb))
+            while (customEvents_.dequeue(cb))
             {
                 cb();
             }
@@ -86,83 +92,63 @@ void EventLoop::loop()
     }
 }
 
-void EventLoop::quit()
+void EventLoop::stop()
 {
-    quit_.store(true, std::memory_order_release);
-    if (!isInLoop())
+    status_.store(Status::STOP, std::memory_order_release);
+    if (!isInLoopThread())
     {
         wakeup();
     }
 }
 
-SignalEventId EventLoop::addSiganlEvent(EventCallback&& callback, int signo)
+void EventLoop::runInLoop(EventCallback&& func)
 {
-    assertInLoop();
-
-#if defined(GODNET_LINUX)
-    constexpr std::size_t maxSigno = _NSIG;
-#elif defined(GODNET_WIN)
-    constexpr std::size_t maxSigno = 64;
-#endif
-    if (signo < 0 || signo >= maxSigno)
+    if (isInLoopThread())
     {
-        return INVALID_EVENT_ID;
+        func();
     }
-    if (signalEvents_.size() != maxSigno)
+    else
     {
-        signalEvents_.resize(64);
-    }
-    if (signalEvents_[signo].getEventType())
-    {
-
-    }
-}
-
-bool EventLoop::delSignalEvent(SignalEventId eventId)
-{
-
-}
-
-bool EventLoop::isInLoop() const noexcept
-{
-    return thread_id_ == system::getThreadId();
-}
-
-void EventLoop::assertInLoop()
-{
-    if (!isInLoop())
-    {
-        std::terminate();
-    }
-}
-
-void EventLoop::updateChannel(ChannelEvent* channel)
-{
-    poller_->update(channel);
-}
-
-void EventLoop::wakeup()
-{
-    std::uint64_t val{1};
-    ::write(wakeup_fd_, &val, sizeof(val));
-}
-
-void EventLoop::queueInLoop(const EventCallback& func)
-{
-    event_callback_queue_.enqueue(func);
-    if (!isInLoop() || !looping_.load(std::memory_order_acquire))
-    {
-        wakeup();
+        queueInLoop(std::move(func));
     }
 }
 
 void EventLoop::queueInLoop(EventCallback&& func)
 {
-    event_callback_queue_.enqueue(std::move(func));
-    if (!isInLoop() || !looping_.load(std::memory_order_acquire))
+    customEvents_.enqueue(std::move(func));
+    if (!isInLoopThread() || status_.load(std::memory_order_acquire) == Status::STOP)
     {
         wakeup();
     }
 }
 
+bool EventLoop::isInLoopThread() const noexcept
+{
+    return threadId_ == system::getThreadId();
+}
+
+void EventLoop::assertInLoopThread()
+{
+    if (!isInLoopThread())
+    {
+        std::terminate();
+    }
+}
+
+void EventLoop::updateChannel(EventChannel* channel)
+{
+    assertInLoopThread();
+
+    poller_->updateChannel(channel);
+}
+
+void EventLoop::wakeup()
+{
+    std::uint64_t val{1};
+#if defined(GODNET_LINUX)
+    ::write(wakeupFds_[0], &val, sizeof(val));
+#elif defined(GODNET_WIN)
+    // TODO
+#endif
+}
 }

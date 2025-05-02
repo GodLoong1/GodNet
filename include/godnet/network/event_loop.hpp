@@ -4,7 +4,6 @@
 #include "godnet/config.hpp"
 #include "godnet/util/noncopyable.hpp"
 #include "godnet/util/lock_free_queue.hpp"
-#include "godnet/network/event_base.hpp"
 
 #include <cstdint>
 #include <atomic>
@@ -17,7 +16,7 @@ namespace godnet
 {
 
 class EventPoller;
-class ChannelEvent;
+class EventChannel;
 
 class GODNET_EXPORT EventLoop : Noncopyable
 {
@@ -27,33 +26,16 @@ public:
     EventLoop();
     ~EventLoop();
 
-    void loop();
-    void quit();
+    void start();
+    void stop();
 
-    SignalEventId addSiganlEvent(EventCallback&& callback, int signo);
-    bool delSignalEvent(SignalEventId eventId);
-
-    template <typename Func, typename =
-        std::enable_if_t<std::is_constructible_v<EventCallback, Func>>>
-    void runInLoop(Func&& func)
-    {
-        if (isInLoop())
-        {
-            func();
-        }
-        else
-        {
-            queueInLoop(std::forward<Func>(func));
-        }
-    }
-
-    void queueInLoop(const EventCallback& func);
+    void runInLoop(EventCallback&& func);
     void queueInLoop(EventCallback&& func);
 
-    bool isInLoop() const noexcept;
-    void assertInLoop();
+    bool isInLoopThread() const noexcept;
+    void assertInLoopThread();
 
-    void updateChannel(ChannelEvent* channel);
+    void updateChannel(EventChannel* channel);
 
 private:
     void wakeup();
@@ -70,18 +52,14 @@ private:
     std::uint64_t startTimeUs_{};
     std::uint64_t curTimeUs_{};
 
-    std::vector<SignalEvent*> signalEvents_{};
-    std::unordered_map<SignalEventId, SignalEvent*> signalEventIds_{};
-
+    // FD事件
     std::unique_ptr<EventPoller> poller_{};
-    std::vector<ChannelEvent*> ready_channel_vec_{};
-    LockFreeQueue<EventCallback> event_callback_queue_{};
-    std::priority_queue<ChannelEvent*> timer_queue_{};
+    std::vector<EventChannel*> channels_{};
 
     // 自定义事件
-    int wakeupFds_[2];
-    std::unique_ptr<ChannelEvent> wakeupChannel_;
-    LockFreeQueue<CustomEvent> customEvents_{};
+    int wakeupFds_[2]{-1, -1};
+    std::unique_ptr<EventChannel> wakeupChannel_{};
+    LockFreeQueue<EventCallback> customEvents_{};
 };
 
 }
