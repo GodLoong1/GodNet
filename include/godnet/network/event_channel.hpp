@@ -4,8 +4,8 @@
 #include "godnet/config.hpp"
 
 #include <cstdint>
-#include <functional>
 #include <memory>
+#include <functional>
 
 #include "godnet/util/noncopyable.hpp"
 
@@ -13,10 +13,12 @@ namespace godnet
 {
 
 class EventLoop;
+
 class GODNET_EXPORT EventChannel : Noncopyable
 {
 public:
     using EventCallback = std::function<void()>;
+
     static const std::uint32_t NONE_EVENT;
     static const std::uint32_t READ_EVENT;
     static const std::uint32_t WRITE_EVENT;

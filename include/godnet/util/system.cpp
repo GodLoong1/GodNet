@@ -5,9 +5,11 @@
 
 #if defined(GODNET_WIN)
     #include <windows.h>
+    #include <sys/timeb.h>
 #elif defined(GODNET_LINUX)
     #include <unistd.h>
     #include <sys/syscall.h>
+    #include <sys/time.h>
 #endif
 
 namespace godnet::system

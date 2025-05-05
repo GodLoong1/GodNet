@@ -54,10 +54,6 @@ void EventPoller::pollEvents(std::vector<EventChannel*>& readyChannels, int time
             readyChannels.emplace_back(channel);
         }
     }
-    else
-    {
-        GODNET_THROW_SYSERR("epoll_wait error");
-    }
 }
 
 void EventPoller::updateChannel(EventChannel* channel)

@@ -7,6 +7,8 @@ set(GODNET_SRC
     network/event_channel.cpp
     network/event_loop.cpp
     network/event_poller.cpp
+    network/timer.cpp
+    network/timer_queue.cpp
     network/socket.cpp
     network/tcp_acceptor.cpp
     network/tcp_socket.cpp

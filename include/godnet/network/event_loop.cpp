@@ -1,20 +1,20 @@
 #include "godnet/network/event_loop.hpp"
 
-#include <atomic>
-#include <csignal>
-
-#include "godnet/util/debug.hpp"
-#include "godnet/util/system.hpp"
-
-#include "godnet/network/event_channel.hpp"
-#include "godnet/network/event_poller.hpp"
-
 #if defined(GODNET_LINUX)
     #include <sys/eventfd.h>
     #include <unistd.h>
 #elif defined(GODNET_WIN)
 
 #endif
+
+#include <csignal>
+#include <chrono>
+
+#include "godnet/util/debug.hpp"
+#include "godnet/util/system.hpp"
+#include "godnet/network/event_channel.hpp"
+#include "godnet/network/event_poller.hpp"
+#include "godnet/network/timer_queue.hpp"
 
 namespace godnet
 {
@@ -23,6 +23,7 @@ thread_local EventLoop* currentThreadLoop{};
 
 EventLoop::EventLoop()
 : threadId_(system::getThreadId()),
+  timers_(std::make_unique<TimerQueue>(this)),
   poller_(std::make_unique<EventPoller>(this))
 {
     if (currentThreadLoop)
@@ -45,6 +46,7 @@ EventLoop::EventLoop()
 #elif defined(GODNET_WIN)
     // TODO
 #endif
+    updateTime();
 }
 
 EventLoop::~EventLoop()
@@ -72,9 +74,18 @@ void EventLoop::start()
 
     while (status_.load(std::memory_order_acquire) == Status::RUNNING)
     {
+        updateTime();
+
+        // 定时器事件
+        int timeout = timers_->getNextTimeout(steadyTimeMs_); 
+        if (timeout == 0)
+        {
+            timers_->handlerTimer(steadyTimeMs_);
+        }
+
         // FD事件
         channels_.clear();
-        poller_->pollEvents(channels_, -1);
+        poller_->pollEvents(channels_, timeout);
         for (auto* channel : channels_)
         {
             channel->handlerEvent();
@@ -99,6 +110,32 @@ void EventLoop::stop()
     {
         wakeup();
     }
+}
+
+TimerId EventLoop::runTimer(std::uint64_t delay,
+                            std::uint64_t interval,
+                            TimerCallback&& callback)
+{
+    return timers_->addTimer(steadyTimeMs_ + delay,
+                             interval,
+                             std::move(callback));
+}
+
+TimerId EventLoop::runTimerAfter(std::uint64_t delay,
+                                 TimerCallback&& callback)
+{
+    return runTimer(delay, 0, std::move(callback));
+}
+
+TimerId EventLoop::runTimerEvery(std::uint64_t interval,
+                                 TimerCallback&& callback)
+{
+    return runTimer(interval, interval, std::move(callback));
+}
+
+void EventLoop::cancelTimer(TimerId id)
+{
+    timers_->delTimer(id);
 }
 
 void EventLoop::runInLoop(EventCallback&& func)
@@ -151,4 +188,12 @@ void EventLoop::wakeup()
     // TODO
 #endif
 }
+
+void EventLoop::updateTime() noexcept
+{
+    using namespace std::chrono;
+    steadyTimeMs_ = duration_cast<milliseconds>(
+        steady_clock::now().time_since_epoch()).count();
+}
+
 }
