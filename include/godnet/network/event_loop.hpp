@@ -25,6 +25,8 @@ class GODNET_EXPORT EventLoop : Noncopyable
 public:
     using EventCallback = std::function<void()>;
 
+    static EventLoop* GetLoop() noexcept;
+
     EventLoop();
     ~EventLoop();
 

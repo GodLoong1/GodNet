@@ -21,6 +21,11 @@ namespace godnet
 
 thread_local EventLoop* currentThreadLoop{};
 
+EventLoop* EventLoop::GetLoop() noexcept
+{
+    return currentThreadLoop;
+}
+
 EventLoop::EventLoop()
 : threadId_(system::getThreadId()),
   timers_(std::make_unique<TimerQueue>(this)),
