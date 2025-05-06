@@ -21,14 +21,6 @@ if (NOT CMAKE_BUILD_TYPE)
 endif()
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 
-# 默认构建共享库
-option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
-if (BUILD_SHARED_LIBS)
-    message(STATUS "Build shared libraries")
-else()
-    message(STATUS "Build static libraries")
-endif()
-
 # 设置编译选项
 function(set_target_compile target)
     target_compile_definitions(${target} PRIVATE 

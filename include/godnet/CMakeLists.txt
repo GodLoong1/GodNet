@@ -18,11 +18,4 @@ set(GODNET_SRC
 add_library(godnet STATIC ${GODNET_SRC})
 set_target_compile(godnet)
 target_link_libraries(godnet fmt::fmt dl)
-set_target_properties(godnet PROPERTIES DEFINE_SYMBOL "")
-
-# 设置导出宏
-target_compile_definitions(godnet PRIVATE
-    $<$<BOOL:${BUILD_SHARED_LIBS}>:
-        GODNET_BUILD_SHARE
-    >
-)
+# set_target_properties(godnet PROPERTIES DEFINE_SYMBOL "")
