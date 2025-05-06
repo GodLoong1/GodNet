@@ -29,9 +29,9 @@ private:
 
     EventLoop* loop_;
 #if defined(GODNET_LINUX)
-    int epoll_fd_;
+    int epollFd_;
 #elif defined(GODNET_WIN)
-    void* epoll_fd_;
+    void* epollFd_;
 #endif
     std::vector<struct epoll_event> events_;
     std::unordered_set<EventChannel*> channels_;

@@ -16,10 +16,6 @@ class EventLoop;
 class GODNET_EXPORT TimerQueue
 {
 public:
-    using TimerHeap = std::priority_queue<TimerPtr,
-                                          std::vector<TimerPtr>,
-                                          std::greater<TimerPtr>>;
-
     explicit TimerQueue(EventLoop* loop);
 
     TimerId addTimer(std::uint64_t expiration,

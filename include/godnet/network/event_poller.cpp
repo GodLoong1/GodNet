@@ -1,15 +1,15 @@
 #include "godnet/network/event_poller.hpp"
 
-#include "godnet/util/debug.hpp"
-#include "godnet/network/event_loop.hpp"
-#include "godnet/network/event_channel.hpp"
-
 #if defined(GODNET_WIN)
     #include "wepoll.h"
 #elif defined(GODNET_LINUX)
     #include <unistd.h>
     #include <sys/epoll.h>
 #endif
+
+#include "godnet/util/debug.hpp"
+#include "godnet/network/event_loop.hpp"
+#include "godnet/network/event_channel.hpp"
 
 namespace godnet
 {
@@ -18,8 +18,8 @@ EventPoller::EventPoller(EventLoop* loop)
 : loop_(loop),
   events_(32)
 {
-    epoll_fd_ = ::epoll_create(1);
-    if (epoll_fd_ < 0)
+    epollFd_ = ::epoll_create(1);
+    if (epollFd_ < 0)
     {
         GODNET_THROW_RUNERR("Failed to create epoll file descriptor");
     } 
@@ -27,9 +27,9 @@ EventPoller::EventPoller(EventLoop* loop)
 
 EventPoller::~EventPoller()
 {
-    if (epoll_fd_ >= 0)
+    if (epollFd_ >= 0)
     {
-        ::close(epoll_fd_);
+        ::close(epollFd_);
     }
 }
 
@@ -37,7 +37,7 @@ void EventPoller::pollEvents(std::vector<EventChannel*>& readyChannels, int time
 {
     loop_->assertInLoopThread();
 
-    int ready = ::epoll_wait(epoll_fd_, events_.data(), static_cast<int>(events_.size()), timeout);
+    int ready = ::epoll_wait(epollFd_, events_.data(), static_cast<int>(events_.size()), timeout);
     if (ready > 0)
     {
         if (ready == static_cast<int>(events_.size()))
@@ -85,7 +85,7 @@ void EventPoller::ctl(int op, EventChannel* channel)
     ev.data.ptr = channel;
     ev.events = channel->events();
 
-    ::epoll_ctl(epoll_fd_, op, channel->fd(), &ev);
+    ::epoll_ctl(epollFd_, op, channel->fd(), &ev);
 }
 
 }
