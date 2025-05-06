@@ -22,7 +22,7 @@ endif()
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 
 # 默认构建共享库
-option(BUILD_SHARED_LIBS "Build shared libraries" ON)
+option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
 if (BUILD_SHARED_LIBS)
     message(STATUS "Build shared libraries")
 else()
