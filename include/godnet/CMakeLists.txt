@@ -40,6 +40,10 @@ target_link_libraries(
         fmt
 )
 
+if(MSVC)
+    target_link_libraries(godnet PRIVATE wepoll)
+endif()
+
 target_include_directories(
     godnet
     PUBLIC
