@@ -17,5 +17,4 @@ set(GODNET_SRC
 # 创建库
 add_library(godnet STATIC ${GODNET_SRC})
 set_target_compile(godnet)
-target_link_libraries(godnet fmt::fmt dl)
-# set_target_properties(godnet PROPERTIES DEFINE_SYMBOL "")
+target_link_libraries(godnet fmt dl)

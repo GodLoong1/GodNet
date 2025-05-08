@@ -48,6 +48,13 @@ void EventPoller::pollEvents(std::vector<EventChannel*>& readyChannels, int time
         for (std::size_t i = 0; i != static_cast<std::size_t>(ready); ++i)
         {
             auto& ev = events_[i];
+#ifdef _WIN32
+            if (ev.events & EPOLLEVENT)
+            {
+                eventCallback_(events_[i].data.u64);
+                continue;
+            }
+#endif
             auto* channel = static_cast<EventChannel*>(ev.data.ptr);
 
             channel->setRevents(ev.events);
@@ -78,6 +85,13 @@ void EventPoller::updateChannel(EventChannel* channel)
         ctl(EPOLL_CTL_ADD, channel);
     }
 }
+
+#ifdef _WIN32
+void EventPoller::postEvent()
+{
+    epoll_post_event(epollfd_, 1);
+}
+#endif
 
 void EventPoller::ctl(int op, EventChannel* channel)
 {

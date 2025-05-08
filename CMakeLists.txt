@@ -1,19 +1,21 @@
+# 设置Cmake最低版本
 cmake_minimum_required(VERSION 3.5)
 project(GodNet
     VERSION 1.0
-    LANGUAGES CXX
+    LANGUAGES CXX C
     DESCRIPTION "GodNet network library"
 )
-
-# 设置输出目录
-set(CMAKE_PROGRAM_PATH ${CMAKE_SOURCE_DIR}/bin)
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
 
 # 设置C++标准
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 message(STATUS "C++ standard: ${CMAKE_CXX_STANDARD}")
+
+# 设置输出目录
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
+
 
 # 配置编译类型（Debug/Release）
 if (NOT CMAKE_BUILD_TYPE)
@@ -78,5 +80,4 @@ include_directories(${CMAKE_SOURCE_DIR}/third_party/wepoll)
 # 添加子目录
 add_subdirectory(${CMAKE_SOURCE_DIR}/include/godnet)
 add_subdirectory(${CMAKE_SOURCE_DIR}/test)
-
-add_subdirectory(${CMAKE_SOURCE_DIR}/third_party/fmt)
+add_subdirectory(${CMAKE_SOURCE_DIR}/third_party)

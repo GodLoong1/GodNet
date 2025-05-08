@@ -1,31 +1,22 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
-
-project(kcp LANGUAGES C)
-
-include(CTest)
-include(GNUInstallDirs)
-
-add_library(kcp STATIC ikcp.c)
-
-install(FILES ikcp.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
-
-install(TARGETS kcp
-    EXPORT kcp-targets
-    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+set(KCP_HEADERS
+    ikcp.h
 )
 
-install(EXPORT kcp-targets
-    FILE kcp-config.cmake
-    NAMESPACE kcp::
-    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/kcp
+set(KCP_SOURCES
+    ikcp.c
 )
 
-if (BUILD_TESTING)
-    enable_language(CXX)
-    
-    add_executable(kcp_test test.cpp)
-    if(MSVC AND NOT (MSVC_VERSION LESS 1900))
-        target_compile_options(kcp_test PRIVATE /utf-8)
-    endif()
-endif ()
+add_library(kcp STATIC ${KCP_HEADERS} ${KCP_SOURCES})
+
+target_include_directories(
+    kcp
+    PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}
+)
+
+set_target_properties(
+    kcp
+    PROPERTIES
+    FOLDER
+    "third_party"
+)

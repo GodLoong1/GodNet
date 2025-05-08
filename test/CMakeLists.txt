@@ -1,5 +1,5 @@
 add_executable(test test.cpp)
-target_link_libraries(test fmt::fmt)
+target_link_libraries(test fmt)
 
 add_executable(endpoint_test endpoint_test.cpp)
 target_link_libraries(endpoint_test godnet)

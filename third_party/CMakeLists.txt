@@ -1,0 +1,5 @@
+add_subdirectory(fmt)
+add_subdirectory(kcp)
+if(MSVC)
+    add_subdirectory(wepoll)
+endif()
