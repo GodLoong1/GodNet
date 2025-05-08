@@ -22,6 +22,12 @@ set(FMT_SOURCES
 
 add_library(fmt STATIC ${FMT_HEADRES} ${FMT_SOURCES})
 
+target_link_libraries(
+    fmt
+    PRIVATE
+    godnet-third-party-interface
+)
+
 target_include_directories(
     fmt
     PUBLIC

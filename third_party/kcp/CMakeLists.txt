@@ -8,6 +8,12 @@ set(KCP_SOURCES
 
 add_library(kcp STATIC ${KCP_HEADERS} ${KCP_SOURCES})
 
+target_link_libraries(
+    kcp
+    PRIVATE
+    godnet-third-party-interface
+)
+
 target_include_directories(
     kcp
     PUBLIC

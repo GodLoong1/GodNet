@@ -187,7 +187,8 @@ void EventLoop::wakeup()
 {
     std::uint64_t val{1};
 #if defined(GODNET_LINUX)
-    ::write(wakeupFd_, &val, sizeof(val));
+    ssize_t i = ::write(wakeupFd_, &val, sizeof(val));
+    (void)i;
 #elif defined(GODNET_WIN)
     // TODO
 #endif
