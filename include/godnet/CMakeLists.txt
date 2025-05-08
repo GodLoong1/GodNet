@@ -38,11 +38,9 @@ target_link_libraries(
         godnet-core-interface
     PUBLIC
         fmt
+        kcp
+        wepoll
 )
-
-if(MSVC)
-    target_link_libraries(godnet PRIVATE wepoll)
-endif()
 
 target_include_directories(
     godnet
