@@ -10,7 +10,7 @@ int main()
     godnet::EventLoop loop;
     auto addr{godnet::makeEndpointV4Any(8080)};
     godnet::TcpAcceptor acceptor(&loop, addr);
-    acceptor.setNewConnectionCallback([](godnet::TcpSocket socket, const godnet::Endpoint& endpoint) {
+    acceptor.setNewConnectionCallback([](godnet::TcpSocket, const godnet::Endpoint& endpoint) {
         fmt::print("New connection from {}\n", endpoint.toIpPort());
     });
     acceptor.listen();
