@@ -73,8 +73,10 @@ private:
     std::vector<EventChannel*> channels_{};
 
     // 自定义事件
-    int wakeupFds_[2]{-1, -1};
+#ifdef __linux__
+    int wakeupFd_;
     std::unique_ptr<EventChannel> wakeupChannel_{};
+#endif
     LockFreeQueue<EventCallback> customEvents_{};
 };
 

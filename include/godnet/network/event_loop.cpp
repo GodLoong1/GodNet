@@ -37,20 +37,19 @@ EventLoop::EventLoop()
     }
     currentThreadLoop = this;
 
-#if defined(GODNET_LINUX)
-    if ((wakeupFds_[0] = ::eventfd(0, EFD_NONBLOCK | EFD_CLOEXEC)) < 0)
+#ifdef __linux__
+    if ((wakeupFd_ = ::eventfd(0, EFD_NONBLOCK | EFD_CLOEXEC)) < 0)
     {
         GODNET_THROW_RUNERR("eventfd() failed");
     }
-    wakeupChannel_ = std::make_unique<EventChannel>(this, wakeupFds_[0]);
+    wakeupChannel_ = std::make_unique<EventChannel>(this, wakeupFd_);
     wakeupChannel_->setReadCallback([this] {
         std::uint64_t val{};
-        ::read(wakeupFds_[0], &val, sizeof(val));
+        ::read(wakeupFd_, &val, sizeof(val));
     });
     wakeupChannel_->enableReading();
-#elif defined(GODNET_WIN)
-    // TODO
 #endif
+
     updateTime();
 }
 
@@ -59,7 +58,7 @@ EventLoop::~EventLoop()
     assertInLoopThread();
 
 #if defined(GODNET_LINUX)
-    ::close(wakeupFds_[0]);
+    ::close(wakeupFd_);
     wakeupChannel_->disableAll();
 #elif defined(GODNET_WIN)
     // TODO
