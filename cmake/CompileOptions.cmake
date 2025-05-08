@@ -77,7 +77,7 @@ target_link_options(godnet-compile-option-interface INTERFACE
     > 
 )
 
-# 默认编译选项
+# 核心编译选项
 add_library(godnet-core-interface INTERFACE)
 target_link_libraries(godnet-core-interface INTERFACE
     godnet-compile-option-interface
