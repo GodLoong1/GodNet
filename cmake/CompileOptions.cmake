@@ -32,10 +32,10 @@ target_compile_options(godnet-warning-interface INTERFACE
 add_library(godnet-no-warning-interface INTERFACE)
 target_compile_options(godnet-no-warning-interface INTERFACE
     $<$<CXX_COMPILER_ID:GNU,Clang>:
-        -W
+        -w
     >
     $<$<CXX_COMPILER_ID:MSVC>:
-        /W0
+        /w0
     >
 )
 
@@ -45,23 +45,25 @@ target_compile_options(godnet-compile-option-interface INTERFACE
     $<$<AND:$<CXX_COMPILER_ID:GNU,Clang>,$<CONFIG:Debug>>:
         -g3
         -O0
+        -D_DEBUG
         -fno-omit-frame-pointer
         -fsanitize=address
         -fsanitize-recover=address
         -fsanitize-address-use-after-scope
     >
     $<$<AND:$<CXX_COMPILER_ID:GNU,Clang>,$<CONFIG:Release>>:
-        -O2
+        -O3
         -DNDEBUG
     >
     $<$<AND:$<CXX_COMPILER_ID:MSVC>,$<CONFIG:Debug>>:
         /Zi
         /Od
+        /D_DEBUG
         _DISABLE_STRING_ANNOTATION
         _DISABLE_VECTOR_ANNOTATION
     >
     $<$<AND:$<CXX_COMPILER_ID:MSVC>,$<CONFIG:Release>>:
-        /O2
+        /O3
         /DNDEBUG
     >
 )
