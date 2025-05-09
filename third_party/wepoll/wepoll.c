@@ -102,6 +102,7 @@ WEPOLL_EXPORT int epoll_wait(HANDLE ephnd,
                              struct epoll_event* events,
                              int maxevents,
                              int timeout);
+WEPOLL_EXPORT void epoll_post_event(HANDLE ephnd, uint64_t event);
 
 #ifdef __cplusplus
 } /* extern "C" */
@@ -680,6 +681,13 @@ err:
   return -1;
 }
 
+void epoll_post_event(HANDLE ephnd, uint64_t event)
+{
+  ULONG_PTR ev;
+  ev = (ULONG_PTR)event;
+  PostQueuedCompletionStatus(ephnd, 1, ev, NULL);
+}
+
 #include <errno.h>
 
 #define ERR__ERRNO_MAPPINGS(X)               \
@@ -1196,6 +1204,12 @@ static inline int port__feed_events(port_state_t* port_state,
   DWORD i;
 
   for (i = 0; i < iocp_event_count; i++) {
+    if (iocp_events[i].lpCompletionKey) {
+      struct epoll_event* ev = &epoll_events[epoll_event_count++];
+      ev->data.u64 = (uint64_t)iocp_events[i].lpCompletionKey;
+      ev->events = EPOLLEVENT;
+      continue;
+    }
     IO_STATUS_BLOCK* io_status_block =
         (IO_STATUS_BLOCK*) iocp_events[i].lpOverlapped;
     struct epoll_event* ev = &epoll_events[epoll_event_count];

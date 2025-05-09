@@ -1,12 +1,12 @@
-set(WEPOLL_HEADERS
-    wepoll.h
-)
-
-set(WEPOLL_SOURCES
-    wepoll.c
-)
-
 if(MSVC)
+    set(WEPOLL_HEADERS
+        wepoll.h
+    )
+
+    set(WEPOLL_SOURCES
+        wepoll.c
+    )
+
     add_library(wepoll STATIC ${WEPOLL_HEADERS} ${WEPOLL_SOURCES})
 
     target_link_libraries(
@@ -20,13 +20,13 @@ if(MSVC)
         PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}
     )
+
+    set_target_properties(
+        wepoll
+        PROPERTIES
+        FOLDER
+        "third_party"
+    )
 else()
     add_library(wepoll INTERFACE)
 endif()
-
-set_target_properties(
-    wepoll
-    PROPERTIES
-    FOLDER
-    "third_party"
-)
