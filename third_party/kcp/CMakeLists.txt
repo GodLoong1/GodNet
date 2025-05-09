@@ -11,13 +11,13 @@ add_library(kcp STATIC ${KCP_HEADERS} ${KCP_SOURCES})
 target_link_libraries(
     kcp
     PRIVATE
-    godnet-third-party-interface
+        godnet-third-party-interface
 )
 
 target_include_directories(
     kcp
     PUBLIC
-    ${CMAKE_CURRENT_SOURCE_DIR}
+        ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
 set_target_properties(

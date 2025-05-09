@@ -38,6 +38,7 @@ target_link_libraries(
         godnet-core-interface
     PUBLIC
         fmt
+        spdlog
         kcp
         wepoll
 )

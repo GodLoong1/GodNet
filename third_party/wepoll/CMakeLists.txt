@@ -12,13 +12,13 @@ if(MSVC)
     target_link_libraries(
         wepoll
         PRIVATE
-        godnet-third-party-interface
+            godnet-third-party-interface
     )
 
     target_include_directories(
         wepoll
         PUBLIC
-        ${CMAKE_CURRENT_SOURCE_DIR}
+            ${CMAKE_CURRENT_SOURCE_DIR}
     )
 
     set_target_properties(
