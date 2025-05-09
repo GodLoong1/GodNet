@@ -39,6 +39,7 @@ target_link_libraries(
     PUBLIC
         fmt
         spdlog
+        nlohmann-json
         kcp
         wepoll
 )

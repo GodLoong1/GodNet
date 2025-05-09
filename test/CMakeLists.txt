@@ -9,3 +9,6 @@ target_link_libraries(event_loop_test PRIVATE godnet-core-interface PUBLIC godne
 
 add_executable(tcp_acceptor_test tcp_acceptor_test.cpp)
 target_link_libraries(tcp_acceptor_test PRIVATE godnet-core-interface PUBLIC godnet)
+
+add_executable(spdlog_test spdlog_test.cpp)
+target_link_libraries(spdlog_test PRIVATE godnet-core-interface PUBLIC godnet)
