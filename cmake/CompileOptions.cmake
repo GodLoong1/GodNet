@@ -60,12 +60,14 @@ target_compile_options(godnet-compile-option-interface INTERFACE
         /Zi
         /Od
         /D_DEBUG
+        /utf-8
         _DISABLE_STRING_ANNOTATION
         _DISABLE_VECTOR_ANNOTATION
     >
     $<$<AND:$<CXX_COMPILER_ID:MSVC>,$<CONFIG:Release>>:
         /O3
         /DNDEBUG
+        /utf-8
     >
 )
 target_link_options(godnet-compile-option-interface INTERFACE
