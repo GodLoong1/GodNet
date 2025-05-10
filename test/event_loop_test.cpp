@@ -1,4 +1,5 @@
 #include <iostream>
+#include <csignal>
 
 #include "godnet/network/event_loop.hpp"
 
@@ -6,6 +7,10 @@ using namespace godnet;
 
 int main()
 {
+    std::signal(SIGINT, [](int){
+        godnet::EventLoop::GetLoop()->stop();
+    });
+
     godnet::EventLoop loop;
     loop.runInLoop([]{
         std::cout << "call runInLoop" << std::endl;

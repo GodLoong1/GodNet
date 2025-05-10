@@ -34,13 +34,13 @@ public:
 };
 
 template<typename... Args>
-void throwGodnetRunErr(const std::string& msg, Args&&... args) noexcept(false)
+void throwGodNetRunErr(const std::string& msg, Args&&... args) noexcept(false)
 {
     throw godnet::GodNetRunErr(msg, std::forward<Args>(args)...);
 }
 
 template<typename... Args>
-void throwGodnetSysErr(const std::string& msg, Args&&... args) noexcept(false)
+void throwGodNetSysErr(const std::string& msg, Args&&... args) noexcept(false)
 {
     throw godnet::GodNetSysErr(msg, std::forward<Args>(args)...);
 }

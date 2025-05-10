@@ -47,7 +47,7 @@ Endpoint::Endpoint(std::string_view ip,
             return;
         }
     }
-    throwGodnetRunErr("invalid ip: {}", ip);
+    throwGodNetRunErr("invalid ip: {}", ip);
 }
 
 std::string Endpoint::toIp() const noexcept
