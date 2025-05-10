@@ -4,6 +4,8 @@
 
 #include "fmt/core.h"
 
+#include "godnet/util/exception.hpp"
+
 namespace godnet
 {
 
@@ -47,7 +49,7 @@ Endpoint::Endpoint(std::string_view ip,
             return;
         }
     }
-    throw std::invalid_argument(fmt::format("invalid ip: {}", ip));
+    throwGodnetRunErr("invalid ip: {}", ip);
 }
 
 std::string Endpoint::toIp() const noexcept

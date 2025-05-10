@@ -25,6 +25,7 @@ target_compile_options(godnet-warning-interface INTERFACE
     >
     $<$<CXX_COMPILER_ID:MSVC>:
         /W3
+        /permissive-
     >
 )
 
