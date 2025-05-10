@@ -1,10 +1,10 @@
 #ifndef GODNET_UTIL_LOGGER_HPP
 #define GODNET_UTIL_LOGGER_HPP
 
-#include "spdlog/spdlog.h"
+#include "spdlog/logger.h"
 
 #define GODNET_LOG(lv, ...) \
-    if (godnet::Logger::Instance().getLevel() >= lv) \
+    if (godnet::Logger::Instance().getLevel() <= lv) \
         godnet::Logger::Instance().getLog()->log(spdlog::source_loc{__FILE__, __LINE__, SPDLOG_FUNCTION}, lv, __VA_ARGS__)
 
 #define GODNET_LOG_TRACE(...) GODNET_LOG(spdlog::level::trace, __VA_ARGS__)
@@ -23,9 +23,14 @@ public:
         return log_;
     }
 
-    spdlog::level_t getLevel() const noexcept
+    spdlog::level::level_enum getLevel() const noexcept
     {
         return log_->level();
+    }
+
+    void setLevel(spdlog::level::level_enum level) noexcept
+    {
+        log_->set_level(level);
     }
 
 private:

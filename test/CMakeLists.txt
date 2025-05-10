@@ -15,3 +15,6 @@ target_link_libraries(spdlog_test PRIVATE godnet-core-interface PUBLIC godnet)
 
 add_executable(nlohmann_json nlohmann_json.cpp)
 target_link_libraries(nlohmann_json PRIVATE godnet-core-interface PUBLIC godnet)
+
+add_executable(logger_test logger_test.cpp)
+target_link_libraries(logger_test PRIVATE godnet-core-interface PUBLIC godnet)
