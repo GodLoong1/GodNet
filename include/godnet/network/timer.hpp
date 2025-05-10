@@ -1,8 +1,6 @@
 #ifndef GODNET_NETWORK_TIMER_HPP
 #define GODNET_NETWORK_TIMER_HPP
 
-#include "godnet/config.hpp"
-
 #include <cstdint>
 #include <functional>
 #include <memory>
@@ -15,7 +13,7 @@ class Timer;
 using TimerPtr = std::shared_ptr<Timer>;
 using TimerCallback = std::function<void()>;
 
-class GODNET_EXPORT Timer
+class Timer
 {
 public:
     Timer(std::uint64_t expiration,

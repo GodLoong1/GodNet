@@ -1,7 +1,6 @@
 #ifndef GODNET_NETWORK_EVENT_POLLER_HPP
 #define GODNET_NETWORK_EVENT_POLLER_HPP
 
-#include "godnet/config.hpp"
 #include "godnet/util/noncopyable.hpp"
 
 #include <vector>
@@ -19,7 +18,7 @@ namespace godnet
 class EventLoop;
 class EventChannel;
 
-class GODNET_EXPORT EventPoller : Noncopyable
+class EventPoller : Noncopyable
 {
 public:
 #ifdef _WIN32
@@ -39,9 +38,9 @@ private:
     void ctl(int op, EventChannel* channel);
 
     EventLoop* loop_;
-#if defined(GODNET_LINUX)
+#ifdef __linux__
     int epollFd_;
-#elif defined(GODNET_WIN)
+#else
     void* epollFd_;
     EventCallback eventCallback_;
 #endif

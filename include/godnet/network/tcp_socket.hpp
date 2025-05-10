@@ -1,15 +1,13 @@
 #ifndef GODNET_NETWORK_TCP_SOCKET_HPP
 #define GODNET_NETWORK_TCP_SOCKET_HPP
 
-#include "godnet/config.hpp"
-
 #include "godnet/network/endpoint.hpp"
 #include "godnet/util/noncopyable.hpp"
 
 namespace godnet
 {
 
-class GODNET_EXPORT TcpSocket : Noncopyable
+class TcpSocket : Noncopyable
 {
 public:
     static TcpSocket MakeSocket(int family);

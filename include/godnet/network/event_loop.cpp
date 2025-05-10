@@ -1,16 +1,14 @@
 #include "godnet/network/event_loop.hpp"
 
-#if defined(GODNET_LINUX)
+#ifdef __linux__
     #include <sys/eventfd.h>
     #include <unistd.h>
-#elif defined(GODNET_WIN)
-
+#elif
 #endif
 
-#include <csignal>
+#include <cassert>
 #include <chrono>
 
-#include "godnet/util/debug.hpp"
 #include "godnet/util/system.hpp"
 #include "godnet/network/event_channel.hpp"
 #include "godnet/network/event_poller.hpp"
@@ -31,17 +29,12 @@ EventLoop::EventLoop()
   timers_(std::make_unique<TimerQueue>(this)),
   poller_(std::make_unique<EventPoller>(this))
 {
-    if (currentThreadLoop)
-    {
-        GODNET_THROW_RUNERR("EventLoop is already created in this thread");
-    }
+    assert(!currentThreadLoop);
     currentThreadLoop = this;
 
 #ifdef __linux__
-    if ((wakeupFd_ = ::eventfd(0, EFD_NONBLOCK | EFD_CLOEXEC)) < 0)
-    {
-        GODNET_THROW_RUNERR("eventfd() failed");
-    }
+    wakeupFd_ = ::eventfd(0, EFD_NONBLOCK | EFD_CLOEXEC);
+    assert(wakeupFd_ >= 0);
     wakeupChannel_ = std::make_unique<EventChannel>(this, wakeupFd_);
     wakeupChannel_->setReadCallback([this] {
         std::uint64_t val{};
@@ -57,11 +50,10 @@ EventLoop::~EventLoop()
 {
     assertInLoopThread();
 
-#if defined(GODNET_LINUX)
+#ifdef __linux__
     ::close(wakeupFd_);
     wakeupChannel_->disableAll();
-#elif defined(GODNET_WIN)
-    // TODO
+#else
 #endif
     currentThreadLoop = nullptr;
 }
@@ -70,10 +62,7 @@ void EventLoop::start()
 {
     assertInLoopThread();
 
-    if (status_.load(std::memory_order_acquire) == Status::RUNNING)
-    {
-        GODNET_THROW_RUNERR("EventLoop is already started");
-    }
+    assert(status_.load(std::memory_order_acquire) != Status::RUNNING);
     status_.store(Status::RUNNING, std::memory_order_release);
 
     while (status_.load(std::memory_order_acquire) == Status::RUNNING)
@@ -157,7 +146,8 @@ void EventLoop::runInLoop(EventCallback&& func)
 void EventLoop::queueInLoop(EventCallback&& func)
 {
     customEvents_.enqueue(std::move(func));
-    if (!isInLoopThread() || status_.load(std::memory_order_acquire) == Status::STOP)
+    if (!isInLoopThread() ||
+        status_.load(std::memory_order_acquire) == Status::STOP)
     {
         wakeup();
     }
@@ -186,11 +176,10 @@ void EventLoop::updateChannel(EventChannel* channel)
 void EventLoop::wakeup()
 {
     std::uint64_t val{1};
-#if defined(GODNET_LINUX)
+#ifdef __linux__
     ssize_t i = ::write(wakeupFd_, &val, sizeof(val));
     (void)i;
-#elif defined(GODNET_WIN)
-    // TODO
+#else
 #endif
 }
 

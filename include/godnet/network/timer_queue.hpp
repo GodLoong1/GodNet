@@ -1,8 +1,6 @@
 #ifndef GODNET_NETWORK_TIMER_QUEUE_HPP
 #define GODNET_NETWORK_TIMER_QUEUE_HPP
 
-#include "godnet/config.hpp"
-
 #include <queue>
 #include <unordered_set>
 
@@ -13,7 +11,7 @@ namespace godnet
 
 class EventLoop;
 
-class GODNET_EXPORT TimerQueue
+class TimerQueue
 {
 public:
     explicit TimerQueue(EventLoop* loop);

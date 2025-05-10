@@ -1,8 +1,6 @@
 #ifndef GODNET_NETWORK_EVENT_LOOP_HPP
 #define GODNET_NETWORK_EVENT_LOOP_HPP
 
-#include "godnet/config.hpp"
-
 #include <cstdint>
 #include <atomic>
 #include <ctime>
@@ -20,7 +18,7 @@ class EventPoller;
 class EventChannel;
 class TimerQueue;
 
-class GODNET_EXPORT EventLoop : Noncopyable
+class EventLoop : Noncopyable
 {
 public:
     using EventCallback = std::function<void()>;

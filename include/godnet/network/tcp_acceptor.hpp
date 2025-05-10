@@ -1,8 +1,6 @@
 #ifndef GODNET_NETWORK_TCP_ACCEPTOR_HPP
 #define GODNET_NETWORK_TCP_ACCEPTOR_HPP
 
-#include "godnet/config.hpp"
-
 #include <functional>
 #include <memory>
 
@@ -16,7 +14,7 @@ namespace godnet
 class EventLoop;
 class EventChannel;
 
-class GODNET_EXPORT TcpAcceptor : Noncopyable
+class TcpAcceptor : Noncopyable
 {
 public:
     using NewConnectionCallback = std::function<void(TcpSocket, const Endpoint&)>;

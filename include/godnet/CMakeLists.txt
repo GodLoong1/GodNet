@@ -1,5 +1,4 @@
 set(GODNET_HEADERS
-    util/debug.hpp
     util/lock_free_queue.hpp
     util/noncopyable.hpp
     util/system.hpp
@@ -16,7 +15,6 @@ set(GODNET_HEADERS
 )
 
 set(GODNET_SOURCES
-    util/debug.cpp
     util/system.cpp
 
     network/endpoint.cpp

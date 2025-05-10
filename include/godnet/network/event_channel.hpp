@@ -1,8 +1,6 @@
 #ifndef GODNET_NETWORK_EVENT_CHANNEL_HPP
 #define GODNET_NETWORK_EVENT_CHANNEL_HPP
 
-#include "godnet/config.hpp"
-
 #include <cstdint>
 #include <memory>
 #include <functional>
@@ -14,7 +12,7 @@ namespace godnet
 
 class EventLoop;
 
-class GODNET_EXPORT EventChannel : Noncopyable
+class EventChannel : Noncopyable
 {
 public:
     using EventCallback = std::function<void()>;

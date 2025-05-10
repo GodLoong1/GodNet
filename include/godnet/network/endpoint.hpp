@@ -1,12 +1,10 @@
 #ifndef GODNET_NETWORK_ENDPOINT_HPP
 #define GODNET_NETWORK_ENDPOINT_HPP
 
-#include "godnet/config.hpp"
-
-#if defined(GODNET_WIN)
+#ifdef _WIN32
     #include <WinSock2.h>
     #include <ws2tcpip.h>
-#elif defined(GODNET_LINUX)
+#else
     #include <arpa/inet.h>
 #endif
 
@@ -17,7 +15,7 @@
 namespace godnet
 {
 
-class GODNET_EXPORT Endpoint
+class Endpoint
 {
 public:
     Endpoint(std::uint16_t port,

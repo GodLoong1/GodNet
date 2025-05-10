@@ -3,10 +3,10 @@
 #include <cstring>
 #include <cerrno>
 
-#if defined(GODNET_WIN)
+#ifdef _WIN32
     #include <windows.h>
     #include <sys/timeb.h>
-#elif defined(GODNET_LINUX)
+#else
     #include <unistd.h>
     #include <sys/syscall.h>
     #include <sys/time.h>
@@ -18,9 +18,9 @@ namespace godnet::system
 std::uint64_t getThreadId() noexcept
 {
     thread_local std::uint64_t thread_id =
-#if defined(GODNET_WIN)
+#ifdef _WIN32
     static_cast<std::uint64_t>(::GetCurrentThreadId());
-#elif defined(GODNET_LINUX)
+#else
     static_cast<std::uint64_t>(::syscall(SYS_gettid));
 #endif
     return thread_id;
@@ -28,16 +28,16 @@ std::uint64_t getThreadId() noexcept
 
 int getSystemErrno() noexcept
 {
-#if defined(GODNET_WIN)
+#ifdef _WIN32
     return ::WSAGetLastError();
-#elif defined(GODNET_LINUX)
+#else
     return errno;
 #endif
 }
 
 std::string getSystemErrorMessage(int err) noexcept
 {
-#if defined(GODNET_WIN)
+#ifdef _WIN32
     char buffer[256];
     ::FormatMessageA(
         FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
@@ -48,7 +48,7 @@ std::string getSystemErrorMessage(int err) noexcept
         sizeof(buffer),
         nullptr);
     return std::string(buffer);
-#elif defined(GODNET_LINUX) 
+#else
     return std::strerror(err);
 #endif
 }

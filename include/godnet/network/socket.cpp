@@ -1,12 +1,11 @@
 #include "godnet/network/socket.hpp"
 
-#include <fcntl.h>
-#include <sys/socket.h>
 
-#if defined(GODNET_LINUX)
+#ifdef __linux__
     #include <unistd.h>
     #include <netinet/in.h>
     #include <netinet/tcp.h>
+    #include <fcntl.h>
 #elif defined(GODNET_WIN)
     #include <ws2tcpip.h>
 #endif
@@ -18,7 +17,7 @@ namespace godnet::socket
 
 void setSocketNonBlock(int sockfd)
 {
-#if defined(GODNET_LINUX)
+#ifdef __linux__
     int flags = ::fcntl(sockfd, F_GETFL, 0);
     flags |= O_NONBLOCK;
     ::fcntl(sockfd, F_SETFL, flags);
@@ -26,7 +25,7 @@ void setSocketNonBlock(int sockfd)
     flags = ::fcntl(sockfd, F_GETFD, 0);
     flags |= FD_CLOEXEC;
     ::fcntl(sockfd, F_SETFD, flags);
-#elif defined(GODNET_WIN)
+#else
     u_long arg = 1;
     ::ioctlsocket(sockfd, FIONBIO, &arg);
 #endif
@@ -34,11 +33,11 @@ void setSocketNonBlock(int sockfd)
 
 int createTcpSocket(int family)
 {
-#if defined(GODNET_LINUX)
+#ifdef __linux__
     return ::socket(family,
                     SOCK_STREAM | SOCK_NONBLOCK | SOCK_CLOEXEC,
                     IPPROTO_TCP);
-#elif defined(GODNET_WIN)
+#else
     int sockfd = static_cast<int>(::socket(family,
                                            SOCK_STREAM,
                                            IPPROTO_TCP));
@@ -52,11 +51,11 @@ int createTcpSocket(int family)
 
 int createUdpSocket(int family)
 {
-#if defined(GODNET_LINUX)
+#ifdef __linux__
     return ::socket(family,
                     SOCK_DGRAM | SOCK_NONBLOCK | SOCK_CLOEXEC,
                     IPPROTO_UDP);
-#elif defined(GODNET_WIN)
+#else
     int sockfd = static_cast<int>(::socket(family,
                                            SOCK_DGRAM,
                                            IPPROTO_DUP));
@@ -70,9 +69,9 @@ int createUdpSocket(int family)
 
 int closeSocket(int sockfd)
 {
-#if defined(GODNET_LINUX)
+#ifdef __linux__
         return ::close(sockfd);
-#elif defined(GODNET_WIN)
+#else
         return ::closesocket(sockfd);
 #endif
 }
@@ -90,12 +89,12 @@ int listenSocket(int sockfd)
 int acceptSocket(int sockfd, Endpoint& endpoint)
 {
     socklen_t socklen = endpoint.getSockLen();
-#if defined(GODNET_LINUX)
+#ifdef __linux__
     return ::accept4(sockfd,
                      endpoint.mutSockAddr(),
                      &socklen,
                      SOCK_NONBLOCK | SOCK_CLOEXEC);
-#elif defined(GODNET_WIN)
+#else
     return ::accept(sockfd,
                     addr.mutSockAddr(),
                     &socklen);
@@ -105,11 +104,11 @@ int acceptSocket(int sockfd, Endpoint& endpoint)
 
 int connectSocket(int sockfd, const Endpoint& endpoint)
 {
-#if defined(GODNET_LINUX)
+#ifdef __linux__
     return ::connect(sockfd,
                      endpoint.getSockAddr(),
                      endpoint.getSockLen());
-#elif defined(GODNET_WIN)
+#else
     return ::connect(sockfd,
                      addr.getSockAddr(),
                      addr.getSockLen());
@@ -134,18 +133,18 @@ int getPeerAddr(int sockfd, Endpoint& endpoint)
 
 int closeWrite(int sockfd)
 {
-#if defined(GODNET_LINUX)
+#ifdef __linux__
     return ::shutdown(sockfd, SHUT_WR);
-#elif defined(GODNET_WIN)
+#else
     return ::shutdown(sockfd, SD_SEND);
 #endif
 }
 
 int setTcpNoDelay(int sockfd, bool on)
 {
-#if defined(GODNET_LINUX)
+#ifdef __linux__
     int optval = on ? 1 : 0;
-#elif defined(GODNET_WIN)
+#else
     char optval = on ? 1 : 0;
 #endif
     return ::setsockopt(sockfd,
@@ -157,9 +156,9 @@ int setTcpNoDelay(int sockfd, bool on)
 
 int setReuseAddr(int sockfd, bool on)
 {
-#if defined(GODNET_LINUX)
+#ifdef __linux__
     int optval = on ? 1 : 0;
-#elif defined(GODNET_WIN)
+#else
     char optval = on ? 1 : 0;
 #endif
     return ::setsockopt(sockfd,
@@ -171,9 +170,9 @@ int setReuseAddr(int sockfd, bool on)
 
 int setReusePort(int sockfd, bool on)
 {
-#if defined(GODNET_LINUX)
+#ifdef __linux__
     int optval = on ? 1 : 0;
-#elif defined(GODNET_WIN)
+#else
     char optval = on ? 1 : 0;
 #endif
     return ::setsockopt(sockfd,
@@ -185,9 +184,9 @@ int setReusePort(int sockfd, bool on)
 
 int setKeepAlive(int sockfd, bool on)
 {
-#if defined(GODNET_LINUX)
+#ifdef __linux__
     int optval = on ? 1 : 0;
-#elif defined(GODNET_WIN)
+#else
     char optval = on ? 1 : 0;
 #endif
     return ::setsockopt(sockfd,
@@ -199,18 +198,18 @@ int setKeepAlive(int sockfd, bool on)
 
 int getSocketError(int sockfd)
 {
-#if defined(GODNET_LINUX)
+#ifdef __linux__
     int optval;
-#elif defined(GODNET_WIN)
+#else
     char optval;
 #endif
     socklen_t optlen = static_cast<socklen_t>(sizeof optval);
 
     if (::getsockopt(sockfd, SOL_SOCKET, SO_ERROR, &optval, &optlen) < 0)
     {
-#if defined(GODNET_LINUX)
+#ifdef __linux__
         return errno;
-#elif defined(GODNET_WIN)
+#else
         return ::WSAGetLastError();
 #endif
     }
@@ -223,12 +222,12 @@ int createTcpSocketPair(int family, int fds[2])
     {
         return -1;
     }
-#if defined(GODNET_LINUX)
+#ifdef __linux__
     return ::socketpair(family,
                         SOCK_STREAM | SOCK_NONBLOCK | SOCK_CLOEXEC,
                         0,
                         fds);
-#elif defined(GODNET_WIN)
+#else
     int listenfd = -1, connfd = -1, acceptfd = -1;
     InetAddress localaddr(0, true, family == AF_INET6);
 

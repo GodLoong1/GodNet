@@ -1,13 +1,14 @@
 #include "godnet/network/event_poller.hpp"
 
-#if defined(GODNET_WIN)
+#ifdef _WIN32
     #include "wepoll.h"
-#elif defined(GODNET_LINUX)
+#else
     #include <unistd.h>
     #include <sys/epoll.h>
 #endif
 
-#include "godnet/util/debug.hpp"
+#include <cassert>
+
 #include "godnet/network/event_loop.hpp"
 #include "godnet/network/event_channel.hpp"
 
@@ -19,10 +20,7 @@ EventPoller::EventPoller(EventLoop* loop)
   events_(32)
 {
     epollFd_ = ::epoll_create(1);
-    if (epollFd_ < 0)
-    {
-        GODNET_THROW_RUNERR("Failed to create epoll file descriptor");
-    } 
+    assert(epollFd_ >= 0);
 }
 
 EventPoller::~EventPoller()

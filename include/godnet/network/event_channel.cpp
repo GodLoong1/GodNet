@@ -1,12 +1,13 @@
 #include "godnet/network/event_channel.hpp"
 
-#if defined(GODNET_WIN)
+#ifdef _WIN32
     #include "wepoll.h"
-#elif defined(GODNET_LINUX)
+#else
     #include <sys/epoll.h>
 #endif
 
-#include "godnet/util/debug.hpp"
+#include <cassert>
+
 #include "godnet/network/event_loop.hpp"
 
 
@@ -20,19 +21,13 @@ const std::uint32_t EventChannel::WRITE_EVENT = EPOLLOUT;
 EventChannel::EventChannel(EventLoop* loop, int fd)
 : loop_(loop), fd_(fd)
 {
-    if (!loop)
-    {
-        GODNET_THROW_RUNERR("EventLoop is nullptr");
-    }
-    if (fd < 0)
-    {
-        GODNET_THROW_RUNERR("fd is invalid");
-    }
+    assert(loop);
+    assert(fd >= 0);
 }
 
 EventChannel::~EventChannel()
 {
-    GODNET_ASSERT(!is_handling_ && "EventChannel is handling events");
+    assert(!is_handling_);
 }
 
 void EventChannel::updateChannel()
