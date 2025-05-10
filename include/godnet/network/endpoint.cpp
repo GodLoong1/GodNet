@@ -1,7 +1,5 @@
 #include "godnet/network/endpoint.hpp"
 
-#include <stdexcept>
-
 #include "fmt/core.h"
 
 #include "godnet/util/exception.hpp"

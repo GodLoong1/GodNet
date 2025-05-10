@@ -2,6 +2,7 @@ set(GODNET_HEADERS
     util/lock_free_queue.hpp
     util/noncopyable.hpp
     util/system.hpp
+    util/logger.hpp
 
     network/endpoint.hpp
     network/event_channel.hpp
@@ -16,6 +17,7 @@ set(GODNET_HEADERS
 
 set(GODNET_SOURCES
     util/system.cpp
+    util/logger.cpp
 
     network/endpoint.cpp
     network/event_channel.cpp
