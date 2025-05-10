@@ -8,7 +8,6 @@ BUILD_DIR=build
 
 # 使用的并发线程数（默认等于 CPU 核心数）
 JOBS=$(nproc)
-JOBS=1
 
 # CMake 配置
 cmake -S . -B $BUILD_DIR \
