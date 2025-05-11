@@ -34,7 +34,8 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY
 
 # 添加子配置
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
-include(CompileOptions)
+include(compile_options)
+include(find_ws2_32)
 
 # 添加子目录
 add_subdirectory(${CMAKE_SOURCE_DIR}/include/godnet)

@@ -7,7 +7,15 @@ if(MSVC)
         wepoll.c
     )
 
-    add_library(wepoll STATIC ${WEPOLL_HEADERS} ${WEPOLL_SOURCES})
+    add_library(wepoll STATIC)
+
+    target_sources(
+        wepoll
+        PRIVATE
+            ${WEPOLL_SOURCES}
+        PUBLIC
+            ${WEPOLL_HEADERS}
+    )
 
     target_link_libraries(
         wepoll

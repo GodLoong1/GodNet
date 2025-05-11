@@ -42,15 +42,8 @@ target_link_libraries(
         nlohmann-json
         kcp
         wepoll
+        ws2_32
 )
-
-if(MSVC)
-    target_link_libraries(
-        godnet
-        PUBLIC
-            ws2_32
-)
-endif()
 
 target_include_directories(
     godnet
