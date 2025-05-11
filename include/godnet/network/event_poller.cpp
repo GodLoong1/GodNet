@@ -19,16 +19,22 @@ EventPoller::EventPoller(EventLoop* loop)
 : loop_(loop),
   events_(32)
 {
-    epollFd_ = ::epoll_create(1);
+#ifdef __linux__
+    epollFd_ = ::epoll_create1(EPOLL_CLOEXEC);
     assert(epollFd_ >= 0);
+#else
+    epollFd_ = ::epoll_create1(0);
+    assert(epollFd_);
+#endif
 }
 
 EventPoller::~EventPoller()
 {
-    if (epollFd_ >= 0)
-    {
-        ::close(epollFd_);
-    }
+#ifdef __linux__
+    ::close(epollFd_);
+#else
+    epoll_close(epollFd_);
+#endif
 }
 
 void EventPoller::pollEvents(std::vector<EventChannel*>& readyChannels, int timeout)
@@ -93,7 +99,7 @@ void EventPoller::postEvent()
 
 void EventPoller::ctl(int op, EventChannel* channel)
 {
-    struct epoll_event ev;
+    struct epoll_event ev{};
     ev.data.ptr = channel;
     ev.events = channel->events();
 
