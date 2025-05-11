@@ -1,0 +1,6 @@
+if(MSVC)
+    add_library(ws2_32 INTERFACE)
+    target_link_libraries(ws2_32 INTERFACE ws2_32)
+else()
+    add_library(ws2_32 INTERFACE)
+endif()

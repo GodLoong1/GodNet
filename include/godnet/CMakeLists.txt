@@ -42,6 +42,7 @@ target_link_libraries(
         nlohmann-json
         kcp
         wepoll
+        ws2_32
 )
 
 target_include_directories(
