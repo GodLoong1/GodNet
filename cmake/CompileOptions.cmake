@@ -35,7 +35,7 @@ target_compile_options(godnet-no-warning-interface INTERFACE
         -w
     >
     $<$<CXX_COMPILER_ID:MSVC>:
-        /w0
+        /W0
     >
 )
 
