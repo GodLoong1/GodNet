@@ -6,9 +6,11 @@
     #include <netinet/in.h>
     #include <netinet/tcp.h>
     #include <fcntl.h>
-#elif defined(GODNET_WIN)
+#else
+    #include <winsock2.h>
     #include <ws2tcpip.h>
 #endif
+
 
 #include "godnet/network/endpoint.hpp"
 
@@ -58,7 +60,7 @@ int createUdpSocket(int family)
 #else
     int sockfd = static_cast<int>(::socket(family,
                                            SOCK_DGRAM,
-                                           IPPROTO_DUP));
+                                           IPPROTO_UDP));
     if (sockfd >= 0)
     {
         setSocketNonBlock(sockfd);
@@ -96,7 +98,7 @@ int acceptSocket(int sockfd, Endpoint& endpoint)
                      SOCK_NONBLOCK | SOCK_CLOEXEC);
 #else
     return ::accept(sockfd,
-                    addr.mutSockAddr(),
+                    endpoint.mutSockAddr(),
                     &socklen);
 #endif
 }
@@ -110,8 +112,8 @@ int connectSocket(int sockfd, const Endpoint& endpoint)
                      endpoint.getSockLen());
 #else
     return ::connect(sockfd,
-                     addr.getSockAddr(),
-                     addr.getSockLen());
+                     endpoint.getSockAddr(),
+                     endpoint.getSockLen());
 #endif
 }
 
@@ -172,14 +174,14 @@ int setReusePort(int sockfd, bool on)
 {
 #ifdef __linux__
     int optval = on ? 1 : 0;
-#else
-    char optval = on ? 1 : 0;
-#endif
     return ::setsockopt(sockfd,
                         SOL_SOCKET,
                         SO_REUSEPORT,
                         &optval,
                         sizeof(optval));
+#else
+    return 0;
+#endif
 }
 
 int setKeepAlive(int sockfd, bool on)
@@ -229,7 +231,7 @@ int createTcpSocketPair(int family, int fds[2])
                         fds);
 #else
     int listenfd = -1, connfd = -1, acceptfd = -1;
-    InetAddress localaddr(0, true, family == AF_INET6);
+    Endpoint localaddr(0, true, family == AF_INET6);
 
     listenfd = createTcpSocket(family);
     if (listenfd < 0)

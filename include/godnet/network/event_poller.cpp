@@ -93,7 +93,7 @@ void EventPoller::updateChannel(EventChannel* channel)
 #ifdef _WIN32
 void EventPoller::postEvent()
 {
-    epoll_post_event(epollfd_, 1);
+    epoll_post_event(epollFd_, 1);
 }
 #endif
 
