@@ -25,7 +25,6 @@ target_compile_options(godnet-warning-interface INTERFACE
     >
     $<$<CXX_COMPILER_ID:MSVC>:
         /W3
-        /permissive-
     >
 )
 
@@ -42,42 +41,57 @@ target_compile_options(godnet-no-warning-interface INTERFACE
 
 # 设置编译选项
 add_library(godnet-compile-option-interface INTERFACE)
+if(GODNET_ASAN)
+    target_compile_options(godnet-compile-option-interface INTERFACE
+        $<$<CXX_COMPILER_ID:GNU,Clang>:
+            -fno-omit-frame-pointer
+            -fsanitize=address
+            -fsanitize-recover=address
+            -fsanitize-address-use-after-scope
+        >
+        $<$<CXX_COMPILER_ID:MSVC>:
+            /fsanitize=address
+        >
+    )
+    target_compile_definitions(godnet-compile-option-interface INTERFACE
+        $<$<CXX_COMPILER_ID:MSVC>:
+            _DISABLE_STRING_ANNOTATION
+            _DISABLE_VECTOR_ANNOTATION
+        >
+    )
+    target_link_options(godnet-compile-option-interface INTERFACE
+        $<$<CXX_COMPILER_ID:GNU,Clang>:
+            -fno-omit-frame-pointer
+            -fsanitize=address
+            -fsanitize-recover=address
+            -fsanitize-address-use-after-scope
+        >
+    )
+    message(STATUS "** Enable Address Sanitizer ASan")
+endif()
+
 target_compile_options(godnet-compile-option-interface INTERFACE
+    $<$<CXX_COMPILER_ID:GNU,Clang>:
+        -fno-delete-null-pointer-checks
+    >
+    $<$<CXX_COMPILER_ID:MSVC>:
+        /permissive-
+        /Zc:throwingNew
+        /utf-8
+        /wd4351
+        /wd4091
+        /w15038
+        /w34100
+        /w34101
+        /w34189
+        /w34389
+        /w35054
+        /we4263
+        /we4264
+    >
     $<$<AND:$<CXX_COMPILER_ID:GNU,Clang>,$<CONFIG:Debug>>:
         -g3
-        -O0
-        -D_DEBUG
-        -fno-omit-frame-pointer
-        -fsanitize=address
-        -fsanitize-recover=address
-        -fsanitize-address-use-after-scope
     >
-    $<$<AND:$<CXX_COMPILER_ID:GNU,Clang>,$<CONFIG:Release>>:
-        -O3
-        -DNDEBUG
-    >
-    $<$<AND:$<CXX_COMPILER_ID:MSVC>,$<CONFIG:Debug>>:
-        /Zi
-        /Od
-        /D_DEBUG
-        /utf-8
-    >
-    $<$<AND:$<CXX_COMPILER_ID:MSVC>,$<CONFIG:Release>>:
-        /O3
-        /DNDEBUG
-        /utf-8
-    >
-)
-target_link_options(godnet-compile-option-interface INTERFACE
-    $<$<AND:$<CXX_COMPILER_ID:GNU,Clang>,$<CONFIG:Debug>>:
-        -fno-omit-frame-pointer
-        -fsanitize=address
-        -fsanitize-recover=address
-        -fsanitize-address-use-after-scope
-    >
-    $<$<AND:$<CXX_COMPILER_ID:MSVC>,$<CONFIG:Debug>>:
-        /fsanitize=address
-    > 
 )
 
 # 核心编译选项

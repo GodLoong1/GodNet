@@ -6,6 +6,8 @@ project(GodNet
     DESCRIPTION "GodNet network library"
 )
 
+option(GODNET_ASAN "Enable Address Sanitizer" ON)
+
 # 配置编译类型（Debug/Release）
 if (NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Choose build type" FORCE)

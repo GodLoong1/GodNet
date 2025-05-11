@@ -6,7 +6,7 @@ file(GLOB_RECURSE FMT_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cc
 )
 
-add_library(fmt STATIC ${FMT_HEADRES} ${FMT_SOURCES})
+add_library(fmt STATIC ${FMT_HEADERS} ${FMT_SOURCES})
 
 target_link_libraries(
     fmt
