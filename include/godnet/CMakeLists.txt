@@ -7,6 +7,8 @@ set(GODNET_HEADERS
     network/endpoint.hpp
     network/event_channel.hpp
     network/event_loop.hpp
+    network/event_loop_thread.hpp
+    network/event_loop_thread_pool.hpp
     network/event_poller.hpp
     network/timer.hpp
     network/timer_queue.hpp
@@ -22,6 +24,8 @@ set(GODNET_SOURCES
     network/endpoint.cpp
     network/event_channel.cpp
     network/event_loop.cpp
+    network/event_loop_thread.cpp
+    network/event_loop_thread_pool.cpp
     network/event_poller.cpp
     network/timer.cpp
     network/timer_queue.cpp

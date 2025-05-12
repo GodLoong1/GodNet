@@ -1,4 +1,5 @@
 #include "godnet/network/event_loop.hpp"
+#include "godnet/util/logger.hpp"
 
 #ifdef __linux__
     #include <sys/eventfd.h>
@@ -48,6 +49,9 @@ EventLoop::EventLoop()
 #endif
 
     updateTime();
+
+    GODNET_LOG_TRACE("threadId: {}", threadId_);
+
 }
 
 EventLoop::~EventLoop()

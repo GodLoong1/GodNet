@@ -14,7 +14,7 @@ Logger& Logger::Instance() noexcept
 Logger::Logger()
 {
     log_ = spdlog::stdout_color_mt("godnet");
-    log_->set_pattern("[%Y-%m-%d %H:%M:%S.%e] [%n] [%^%l%$] %v");
+    log_->set_pattern("[%Y-%m-%d %H:%M:%S.%e] [%n] [%^%l%$] [%s:%# %!] %v");
     log_->set_level(spdlog::level::trace);
 }
 

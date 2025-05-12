@@ -48,6 +48,11 @@ public:
 
     void updateChannel(EventChannel* channel);
 
+    std::uint64_t threadId() const noexcept
+    {
+        return threadId_;
+    }
+
 private:
     void wakeup();
     void updateTime() noexcept;

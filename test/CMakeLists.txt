@@ -21,3 +21,9 @@ target_link_libraries(logger_test PRIVATE godnet-core-interface PUBLIC godnet)
 
 add_executable(asan_test asan_test.cpp)
 target_link_libraries(asan_test PRIVATE godnet-core-interface PUBLIC godnet)
+
+add_executable(event_loop_thread_test event_loop_thread_test.cpp)
+target_link_libraries(event_loop_thread_test PRIVATE godnet-core-interface PUBLIC godnet)
+
+add_executable(event_loop_thread_pool_test event_loop_thread_pool_test.cpp)
+target_link_libraries(event_loop_thread_pool_test PRIVATE godnet-core-interface PUBLIC godnet)
