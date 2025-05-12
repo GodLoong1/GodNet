@@ -91,9 +91,9 @@ void EventPoller::updateChannel(EventChannel* channel)
 }
 
 #ifdef _WIN32
-void EventPoller::postEvent()
+void EventPoller::postEvent(std::uint64_t event)
 {
-    epoll_post_event(epollFd_, 1);
+    epoll_post_event(epollFd_, event);
 }
 #endif
 

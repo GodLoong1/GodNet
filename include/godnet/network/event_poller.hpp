@@ -30,8 +30,14 @@ public:
 
     void pollEvents(std::vector<EventChannel*>& readyChannels, int timeout);
     void updateChannel(EventChannel* channel);
+
 #ifdef _WIN32
-    void postEvent();
+    void postEvent(std::uint64_t event);
+
+    void setPostEvent(EventCallback&& callback) noexcept
+    {
+        eventCallback_ = std::move(callback);
+    }
 #endif
 
 private:

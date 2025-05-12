@@ -41,6 +41,10 @@ EventLoop::EventLoop()
         ::read(wakeupFd_, &val, sizeof(val));
     });
     wakeupChannel_->enableReading();
+#else
+    poller_->setPostEvent([](std::uint64_t event) {
+        assert(event == 1);
+    });
 #endif
 
     updateTime();
@@ -180,6 +184,7 @@ void EventLoop::wakeup()
     ssize_t i = ::write(wakeupFd_, &val, sizeof(val));
     (void)i;
 #else
+    poller_->postEvent(1);
 #endif
 }
 
