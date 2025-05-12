@@ -1,10 +1,10 @@
 if(MSVC)
     set(WEPOLL_HEADERS
-        wepoll.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/wepoll.h
     )
 
     set(WEPOLL_SOURCES
-        wepoll.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/wepoll.c
     )
 
     add_library(wepoll STATIC)
@@ -27,13 +27,6 @@ if(MSVC)
         wepoll
         PUBLIC
             ${CMAKE_CURRENT_SOURCE_DIR}
-    )
-
-    set_target_properties(
-        wepoll
-        PROPERTIES
-        FOLDER
-        "third_party"
     )
 else()
     add_library(wepoll INTERFACE)

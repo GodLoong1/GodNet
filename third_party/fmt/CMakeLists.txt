@@ -6,7 +6,15 @@ file(GLOB_RECURSE FMT_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cc
 )
 
-add_library(fmt STATIC ${FMT_HEADERS} ${FMT_SOURCES})
+add_library(fmt STATIC)
+
+target_sources(
+    fmt
+    PRIVATE
+        ${FMT_SOURCES}
+    PUBLIC
+        ${FMT_HEADERS}
+)
 
 target_link_libraries(
     fmt
@@ -18,11 +26,4 @@ target_include_directories(
     fmt
     PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/include
-)
-
-set_target_properties(
-    fmt
-    PROPERTIES
-    FOLDER
-    "third_party"
 )
