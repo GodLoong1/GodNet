@@ -7,6 +7,7 @@ project(GodNet
 )
 
 option(GODNET_ASAN "Enable Address Sanitizer" ON)
+set(CMAKE_EXPORT_COMPILE_COMMANDS true)
 
 # 配置编译类型（Debug/Release）
 if (NOT CMAKE_BUILD_TYPE)
