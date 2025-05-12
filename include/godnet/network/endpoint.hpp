@@ -18,6 +18,8 @@ namespace godnet
 class Endpoint
 {
 public:
+    Endpoint() noexcept;
+
     Endpoint(std::uint16_t port,
              bool loopback,
              bool ipv6) noexcept;

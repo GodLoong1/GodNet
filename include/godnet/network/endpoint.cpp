@@ -7,6 +7,13 @@
 namespace godnet
 {
 
+Endpoint::Endpoint() noexcept
+{
+    addr_.v4.sin_family = AF_INET;
+    addr_.v4.sin_port = 0;
+    addr_.v4.sin_addr.s_addr = INADDR_ANY;
+}
+
 Endpoint::Endpoint(std::uint16_t port,
                    bool loopback,
                    bool ipv6) noexcept

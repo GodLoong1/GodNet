@@ -10,17 +10,12 @@ namespace godnet
 class TcpSocket : Noncopyable
 {
 public:
-    static TcpSocket MakeSocket(int family);
-
-    TcpSocket() = default;
-    explicit TcpSocket(int sockfd);
-    TcpSocket(TcpSocket&& other) noexcept;
-    TcpSocket& operator=(TcpSocket&& other) noexcept;
+    explicit TcpSocket(int sockfd) noexcept;
     ~TcpSocket();
 
     void bind(const Endpoint& localEndpoint);
     void listen();
-    TcpSocket accept(Endpoint& peerEndpoint);
+    int accept(Endpoint& peerEndpoint);
     void closeWrite();
 
     void setTcpNoDelay(bool on);
@@ -28,7 +23,7 @@ public:
     void setReusePort(bool on);
     void setKeepAlive(bool on);
 
-    int getSockfd() const noexcept
+    int fd() const noexcept
     {
         return sockfd_;
     }

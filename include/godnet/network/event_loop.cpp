@@ -72,7 +72,6 @@ void EventLoop::start()
     while (status_.load(std::memory_order_acquire) == Status::RUNNING)
     {
         updateTime();
-
         // 定时器事件
         int timeout = timers_->getNextTimeout(steadyTimeMs_); 
         if (timeout == 0)
@@ -80,6 +79,7 @@ void EventLoop::start()
             timers_->handlerTimer(steadyTimeMs_);
         }
 
+        updateTime();
         // FD事件
         channels_.clear();
         poller_->pollEvents(channels_, timeout);
@@ -88,6 +88,7 @@ void EventLoop::start()
             channel->handlerEvent();
         }
 
+        updateTime();
         // 处理自定义事件
         while (!customEvents_.empty())
         {

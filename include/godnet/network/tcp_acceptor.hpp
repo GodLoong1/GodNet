@@ -17,7 +17,7 @@ class EventChannel;
 class TcpAcceptor : Noncopyable
 {
 public:
-    using NewConnectionCallback = std::function<void(TcpSocket, const Endpoint&)>;
+    using NewConnectionCallback = std::function<void(int, const Endpoint&)>;
 
     TcpAcceptor(EventLoop* loop,
                 const Endpoint& endpoint,
