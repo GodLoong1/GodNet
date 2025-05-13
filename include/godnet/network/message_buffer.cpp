@@ -68,7 +68,7 @@ std::uint32_t MessageBuffer::readInt32() noexcept
 
 std::uint64_t MessageBuffer::readInt64() noexcept
 {
-    std::uint32_t val = peekInt64();
+    std::uint64_t val = peekInt64();
     retrieve(sizeof(val));
     return val;
 }
