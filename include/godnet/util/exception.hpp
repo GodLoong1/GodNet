@@ -8,6 +8,12 @@
 
 #include "godnet/util/system.hpp"
 
+#define GODNET_THROW_RUNERR(...) \
+    throw godnet::GodNetRunErr(__VA_ARGS__)
+
+#define GODNET_THROW_SYSERR(...) \
+    throw godnet::GodNetSysErr(__VA_ARGS__)
+
 namespace godnet
 {
 
@@ -32,18 +38,6 @@ public:
     {
     }
 };
-
-template<typename... Args>
-void throwGodNetRunErr(const std::string& msg, Args&&... args) noexcept(false)
-{
-    throw godnet::GodNetRunErr(msg, std::forward<Args>(args)...);
-}
-
-template<typename... Args>
-void throwGodNetSysErr(const std::string& msg, Args&&... args) noexcept(false)
-{
-    throw godnet::GodNetSysErr(msg, std::forward<Args>(args)...);
-}
 
 }
 

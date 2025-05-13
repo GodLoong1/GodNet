@@ -3,6 +3,7 @@ set(GODNET_HEADERS
     util/noncopyable.hpp
     util/system.hpp
     util/logger.hpp
+    util/endian.hpp
 
     network/endpoint.hpp
     network/event_channel.hpp
@@ -15,6 +16,7 @@ set(GODNET_HEADERS
     network/socket.hpp
     network/tcp_acceptor.hpp
     network/tcp_socket.hpp
+    network/message_buffer.hpp
 )
 
 set(GODNET_SOURCES
@@ -32,6 +34,7 @@ set(GODNET_SOURCES
     network/socket.cpp
     network/tcp_acceptor.cpp
     network/tcp_socket.cpp
+    network/message_buffer.cpp
 )
 
 # 创建库
