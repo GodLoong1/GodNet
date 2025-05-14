@@ -161,7 +161,6 @@ void MessageBuffer::reallocate(std::size_t length) noexcept
 {
     const std::size_t readSize = readByte();
 
-    // 重新分配
     if (size() - readByte() < length)
     {
         size_t newSize = (size() + length) * 2;
@@ -175,7 +174,7 @@ void MessageBuffer::reallocate(std::size_t length) noexcept
         write_ = read_ + readSize;
         end_ = start_ + newSize;
     }
-    else // 将数据往头部移动
+    else
     {
         std::memmove(start_, read_, readSize);
 
