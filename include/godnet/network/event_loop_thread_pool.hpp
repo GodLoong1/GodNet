@@ -3,7 +3,8 @@
 
 #include <vector>
 #include <memory>
-#include <cstdint>
+#include <string>
+#include <cstddef>
 
 #include "godnet/util/noncopyable.hpp"
 
@@ -16,8 +17,8 @@ class EventLoopThread;
 class EventLoopThreadPool : public Noncopyable
 {
 public:
-    EventLoopThreadPool(std::uint32_t threadNum,
-                        std::string threadName) noexcept;
+    EventLoopThreadPool(std::size_t threadNum,
+                        const std::string& threadName) noexcept;
 
     void start() noexcept;
     void stop() noexcept;

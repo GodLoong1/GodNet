@@ -6,11 +6,12 @@
 namespace godnet
 {
 
-EventLoopThreadPool::EventLoopThreadPool(std::uint32_t threadNum,
-                                         std::string threadName) noexcept
+EventLoopThreadPool::EventLoopThreadPool(
+    std::size_t threadNum,
+    const std::string& threadName) noexcept
 {
     loops_.reserve(threadNum);
-    for (std::uint32_t i = 0; i != threadNum; ++i)
+    for (std::size_t i = 0; i != threadNum; ++i)
     {
         loops_.push_back(std::make_unique<EventLoopThread>(threadName));
     }
