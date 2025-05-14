@@ -1,5 +1,8 @@
 #include "godnet/network/event_loop_thread_pool.hpp"
 
+#include "godnet/network/event_loop.hpp"
+#include "godnet/network/event_loop_thread.hpp"
+
 namespace godnet
 {
 

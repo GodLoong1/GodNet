@@ -1,14 +1,9 @@
 #include "godnet/network/event_loop_thread.hpp"
 
-#ifdef __linux__
-    #include <sys/prctl.h>
-#endif
-
 #include <cassert>
 
-#ifndef NDEBUG
-    #include "godnet/util/system.hpp"
-#endif
+#include "godnet/util/system.hpp"
+#include "godnet/network/event_loop.hpp"
 
 namespace godnet
 {
@@ -22,9 +17,8 @@ void EventLoopThread::start() noexcept
 {
     assert(!thread_.joinable());
     thread_ = std::thread([this] {
-#ifdef __linux__
-        ::prctl(PR_SET_NAME, name_.c_str());
-#endif
+        system::setThreadName(name_);
+
         EventLoop loop;
         loop.queueInLoop([this, &loop]{
             loop_.store(&loop, std::memory_order_release);

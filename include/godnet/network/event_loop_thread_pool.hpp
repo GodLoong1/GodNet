@@ -6,10 +6,12 @@
 #include <cstdint>
 
 #include "godnet/util/noncopyable.hpp"
-#include "godnet/network/event_loop_thread.hpp"
 
 namespace godnet
 {
+
+class EventLoop;
+class EventLoopThread;
 
 class EventLoopThreadPool : public Noncopyable
 {

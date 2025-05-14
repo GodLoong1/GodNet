@@ -13,6 +13,8 @@ int getSystemErrno() noexcept;
 
 std::string getSystemErrorMessage(int err) noexcept;
 
+void setThreadName(const std::string& name) noexcept;
+
 }
 
 #endif

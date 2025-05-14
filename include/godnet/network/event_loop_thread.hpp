@@ -6,10 +6,11 @@
 #include <string>
 
 #include "godnet/util/noncopyable.hpp"
-#include "godnet/network/event_loop.hpp"
 
 namespace godnet
 {
+
+class EventLoop;
 
 class EventLoopThread : Noncopyable
 {

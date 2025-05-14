@@ -1,4 +1,5 @@
 #include "godnet/network/event_loop_thread.hpp"
+#include "godnet/network/event_loop.hpp"
 #include "fmt/core.h"
 #include <chrono>
 #include <thread>
