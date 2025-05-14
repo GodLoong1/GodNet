@@ -1,44 +1,52 @@
 set(GODNET_HEADERS
-    util/lock_free_queue.hpp
-    util/noncopyable.hpp
-    util/system.hpp
-    util/logger.hpp
-    util/endian.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/util/lock_free_queue.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/util/noncopyable.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/util/system.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/util/logger.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/util/endian.hpp
 
-    network/endpoint.hpp
-    network/event_channel.hpp
-    network/event_loop.hpp
-    network/event_loop_thread.hpp
-    network/event_loop_thread_pool.hpp
-    network/event_poller.hpp
-    network/timer.hpp
-    network/timer_queue.hpp
-    network/socket.hpp
-    network/tcp_acceptor.hpp
-    network/tcp_socket.hpp
-    network/message_buffer.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/network/endpoint.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/network/event_channel.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/network/event_loop.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/network/event_loop_thread.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/network/event_loop_thread_pool.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/network/event_poller.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/network/timer.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/network/timer_queue.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/network/socket.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/network/tcp_acceptor.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/network/tcp_socket.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/network/message_buffer.hpp
 )
 
 set(GODNET_SOURCES
-    util/system.cpp
-    util/logger.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/util/system.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/util/logger.cpp
 
-    network/endpoint.cpp
-    network/event_channel.cpp
-    network/event_loop.cpp
-    network/event_loop_thread.cpp
-    network/event_loop_thread_pool.cpp
-    network/event_poller.cpp
-    network/timer.cpp
-    network/timer_queue.cpp
-    network/socket.cpp
-    network/tcp_acceptor.cpp
-    network/tcp_socket.cpp
-    network/message_buffer.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/network/endpoint.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/network/event_channel.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/network/event_loop.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/network/event_loop_thread.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/network/event_loop_thread_pool.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/network/event_poller.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/network/timer.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/network/timer_queue.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/network/socket.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/network/tcp_acceptor.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/network/tcp_socket.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/network/message_buffer.cpp
 )
 
-# 创建库
-add_library(godnet STATIC ${GODNET_HEADERS} ${GODNET_SOURCES})
+add_library(godnet STATIC)
+
+target_sources(
+    godnet
+    PRIVATE
+        ${GODNET_SOURCES}
+    PUBLIC
+        ${GODNET_HEADERS}
+)
+
 target_link_libraries(
     godnet
     PRIVATE
