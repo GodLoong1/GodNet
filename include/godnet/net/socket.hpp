@@ -6,42 +6,42 @@ namespace godnet
 
 class InetAddress;
 
-namespace socket
+}
+
+namespace godnet::socket
 {
 
-void setSocketNonBlock(int sockfd);
+void setSocketNonBlock(int sockfd) noexcept;
 
-int createTcpSocket(int family);
+int createTcpSocket(int family) noexcept;
 
-int createUdpSocket(int family);
+int createUdpSocket(int family) noexcept;
 
-int closeSocket(int sockfd);
+int closeSocket(int sockfd) noexcept;
 
-int bindAddress(int sockfd, const InetAddress& localAddr);
+int bindAddress(int sockfd, const InetAddress& localAddr) noexcept;
 
-int listenSocket(int sockfd);
+int listenSocket(int sockfd) noexcept;
 
-int acceptSocket(int sockfd, InetAddress& localAddr);
+int acceptSocket(int sockfd, InetAddress& localAddr) noexcept;
 
-int connectSocket(int sockfd, const InetAddress& localAddr);
+int connectSocket(int sockfd, const InetAddress& localAddr) noexcept;
 
-int getLocalAddr(int sockfd, InetAddress& localAddr);
+int getLocalAddr(int sockfd, InetAddress& localAddr) noexcept;
 
-int getPeerAddr(int sockfd, InetAddress& peerAddr);
+int getPeerAddr(int sockfd, InetAddress& peerAddr) noexcept;
 
-int closeWrite(int sockfd);
+int closeWrite(int sockfd) noexcept;
 
-int setTcpNoDelay(int sockfd, bool on);
+int setTcpNoDelay(int sockfd, bool on) noexcept;
 
-int setReuseAddr(int sockfd, bool on);
+int setReuseAddr(int sockfd, bool on) noexcept;
 
-int setReusePort(int sockfd, bool on);
+int setReusePort(int sockfd, bool on) noexcept;
 
-int setKeepAlive(int sockfd, bool on);
+int setKeepAlive(int sockfd, bool on) noexcept;
 
-int getSocketError(int sockfd);
-
-}
+int getSocketError(int sockfd) noexcept;
 
 }
 

@@ -15,7 +15,7 @@
 namespace godnet::socket
 {
 
-void setSocketNonBlock(int sockfd)
+void setSocketNonBlock(int sockfd) noexcept
 {
 #ifdef __linux__
     int flags = ::fcntl(sockfd, F_GETFL, 0);
@@ -31,7 +31,7 @@ void setSocketNonBlock(int sockfd)
 #endif
 }
 
-int createTcpSocket(int family)
+int createTcpSocket(int family) noexcept
 {
 #ifdef __linux__
     return ::socket(family,
@@ -49,7 +49,7 @@ int createTcpSocket(int family)
 #endif
 }
 
-int createUdpSocket(int family)
+int createUdpSocket(int family) noexcept
 {
 #ifdef __linux__
     return ::socket(family,
@@ -67,7 +67,7 @@ int createUdpSocket(int family)
 #endif
 }
 
-int closeSocket(int sockfd)
+int closeSocket(int sockfd) noexcept
 {
 #ifdef __linux__
         return ::close(sockfd);
@@ -76,17 +76,17 @@ int closeSocket(int sockfd)
 #endif
 }
 
-int bindAddress(int sockfd, const InetAddress& endpoint)
+int bindAddress(int sockfd, const InetAddress& endpoint) noexcept
 {
     return ::bind(sockfd, endpoint.getSockAddr(), endpoint.getSockLen());
 }
 
-int listenSocket(int sockfd)
+int listenSocket(int sockfd) noexcept
 {
     return ::listen(sockfd, SOMAXCONN);
 }
 
-int acceptSocket(int sockfd, InetAddress& endpoint)
+int acceptSocket(int sockfd, InetAddress& endpoint) noexcept
 {
     socklen_t socklen = endpoint.getSockLen();
 #ifdef __linux__
@@ -102,7 +102,7 @@ int acceptSocket(int sockfd, InetAddress& endpoint)
 }
 
 
-int connectSocket(int sockfd, const InetAddress& endpoint)
+int connectSocket(int sockfd, const InetAddress& endpoint) noexcept
 {
 #ifdef __linux__
     return ::connect(sockfd,
@@ -115,7 +115,7 @@ int connectSocket(int sockfd, const InetAddress& endpoint)
 #endif
 }
 
-int getLocalAddr(int sockfd, InetAddress& endpoint)
+int getLocalAddr(int sockfd, InetAddress& endpoint) noexcept
 {
     socklen_t socklen = endpoint.getSockLen();
     return ::getsockname(sockfd,
@@ -123,7 +123,7 @@ int getLocalAddr(int sockfd, InetAddress& endpoint)
                          &socklen);
 }
 
-int getPeerAddr(int sockfd, InetAddress& endpoint)
+int getPeerAddr(int sockfd, InetAddress& endpoint) noexcept
 {
     socklen_t socklen = endpoint.getSockLen();
     return ::getpeername(sockfd,
@@ -131,7 +131,7 @@ int getPeerAddr(int sockfd, InetAddress& endpoint)
                          &socklen);
 }
 
-int closeWrite(int sockfd)
+int closeWrite(int sockfd) noexcept
 {
 #ifdef __linux__
     return ::shutdown(sockfd, SHUT_WR);
@@ -140,7 +140,7 @@ int closeWrite(int sockfd)
 #endif
 }
 
-int setTcpNoDelay(int sockfd, bool on)
+int setTcpNoDelay(int sockfd, bool on) noexcept
 {
 #ifdef __linux__
     int optval = on ? 1 : 0;
@@ -154,7 +154,7 @@ int setTcpNoDelay(int sockfd, bool on)
                         sizeof(optval));
 }
 
-int setReuseAddr(int sockfd, bool on)
+int setReuseAddr(int sockfd, bool on) noexcept
 {
 #ifdef __linux__
     int optval = on ? 1 : 0;
@@ -168,7 +168,7 @@ int setReuseAddr(int sockfd, bool on)
                         sizeof(optval));
 }
 
-int setReusePort(int sockfd, bool on)
+int setReusePort(int sockfd, bool on) noexcept
 {
 #ifdef __linux__
     int optval = on ? 1 : 0;
@@ -182,7 +182,7 @@ int setReusePort(int sockfd, bool on)
 #endif
 }
 
-int setKeepAlive(int sockfd, bool on)
+int setKeepAlive(int sockfd, bool on) noexcept
 {
 #ifdef __linux__
     int optval = on ? 1 : 0;
@@ -196,7 +196,7 @@ int setKeepAlive(int sockfd, bool on)
                         sizeof(optval));
 }
 
-int getSocketError(int sockfd)
+int getSocketError(int sockfd) noexcept
 {
 #ifdef __linux__
     int optval;

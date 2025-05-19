@@ -22,10 +22,14 @@ public:
     TcpAcceptor(EventLoop* loop, const InetAddress& localAddr) noexcept;
     ~TcpAcceptor();
 
-    void listen();
-    void setReuseAddr(bool on);
-    void setReusePort(bool on);
-    void setNewConnectionCallback(NewConnectionCallback cb);
+    bool listen() noexcept;
+    bool setReuseAddr(bool on) noexcept;
+    bool setReusePort(bool on) noexcept;
+
+    void setNewConnectionCallback(NewConnectionCallback&& callback) noexcept
+    {
+        newConnectionCallback_ = std::move(callback);
+    }
 
 private:
     void handleRead();

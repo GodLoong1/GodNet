@@ -35,33 +35,30 @@ TcpAcceptor::~TcpAcceptor()
     channel_->disableAll();
 }
 
-void TcpAcceptor::listen()
+bool TcpAcceptor::listen() noexcept
 {
     loop_->assertInLoopThread();
 
-    socket_->listen();
+    if (!socket_->listen())
+    {
+        return false;
+    }
     channel_->enableReading();
+    return true;
 }
 
-void TcpAcceptor::setReuseAddr(bool on)
+bool TcpAcceptor::setReuseAddr(bool on) noexcept
 {
     loop_->assertInLoopThread();
 
-    socket_->setReuseAddr(on);
+    return socket_->setReuseAddr(on);
 }
 
-void TcpAcceptor::setReusePort(bool on)
+bool TcpAcceptor::setReusePort(bool on) noexcept
 {
     loop_->assertInLoopThread();
 
-    socket_->setReusePort(on);
-}
-
-void TcpAcceptor::setNewConnectionCallback(NewConnectionCallback cb)
-{
-    loop_->assertInLoopThread();
-
-    newConnectionCallback_ = std::move(cb);
+    return socket_->setReusePort(on);
 }
 
 void TcpAcceptor::handleRead()
