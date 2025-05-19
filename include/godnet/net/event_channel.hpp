@@ -1,5 +1,5 @@
-#ifndef GODNET_NETWORK_EVENT_CHANNEL_HPP
-#define GODNET_NETWORK_EVENT_CHANNEL_HPP
+#ifndef GODNET_NET_EVENT_CHANNEL_HPP
+#define GODNET_NET_EVENT_CHANNEL_HPP
 
 #include <cstdint>
 #include <memory>
@@ -21,7 +21,7 @@ public:
     static const std::uint32_t READ_EVENT;
     static const std::uint32_t WRITE_EVENT;
 
-    EventChannel(EventLoop* loop, int fd);
+    EventChannel(EventLoop* loop, int fd) noexcept;
     ~EventChannel();
 
     void setReadCallback(EventCallback&& callback) noexcept
@@ -51,14 +51,8 @@ public:
 
     void bindWeakPtr(std::weak_ptr<void>&& object) noexcept
     {
-        is_bind = true;
+        isBind_ = true;
         bindObject_ = std::move(object);
-    }
-
-    void bindWeakPtr(const std::weak_ptr<void>& object)
-    {
-        is_bind = true;
-        bindObject_ = object;
     }
 
     EventLoop* loop() const noexcept
@@ -86,31 +80,31 @@ public:
         revents_ = revents;
     }
 
-    void enableReading()
+    void enableReading() noexcept
     {
         events_ |= READ_EVENT;
         updateChannel();
     }
 
-    void enableWriting()
+    void enableWriting() noexcept
     {
         events_ |= WRITE_EVENT;
         updateChannel();
     }
 
-    void disableReading()
+    void disableReading() noexcept
     {
         events_ &= ~READ_EVENT;
         updateChannel();
     }
 
-    void disableWriting()
+    void disableWriting() noexcept
     {
         events_ &= ~WRITE_EVENT;
         updateChannel();
     }
 
-    void disableAll()
+    void disableAll() noexcept
     {
         events_ = NONE_EVENT;
         updateChannel();
@@ -131,26 +125,26 @@ public:
         return events_ == NONE_EVENT;
     }
 
-    void updateChannel();
+    void updateChannel() noexcept;
     void handlerEvent();
 
 private:
     void handlerEventSafe();
 
-    EventLoop* loop_{};
-    int fd_{};
+    EventLoop* loop_;
+    int fd_;
     std::uint32_t events_{};
     std::uint32_t revents_{};
 
-    EventCallback readCallback_{};
-    EventCallback writeCallback_{};
-    EventCallback errorCallback_{};
-    EventCallback closeCallback_{};
-    EventCallback eventCallback_{};
+    EventCallback readCallback_;
+    EventCallback writeCallback_;
+    EventCallback errorCallback_;
+    EventCallback closeCallback_;
+    EventCallback eventCallback_;
 
-    bool is_bind{};
-    bool is_handling_{};
-    std::weak_ptr<void> bindObject_{};
+    bool isBind_{};
+    bool isHandling_{};
+    std::weak_ptr<void> bindObject_;
 };
 
 }

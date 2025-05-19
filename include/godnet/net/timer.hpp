@@ -1,9 +1,10 @@
-#ifndef GODNET_NETWORK_TIMER_HPP
-#define GODNET_NETWORK_TIMER_HPP
+#ifndef GODNET_NET_TIMER_HPP
+#define GODNET_NET_TIMER_HPP
 
 #include <cstdint>
 #include <functional>
 #include <memory>
+#include <chrono>
 
 namespace godnet
 {
@@ -11,18 +12,19 @@ namespace godnet
 using TimerId = std::uint64_t;
 class Timer;
 using TimerPtr = std::shared_ptr<Timer>;
-using TimerCallback = std::function<void()>;
+using TimerCallback = std::function<void(TimerId)>;
+using namespace std::chrono_literals;
 
 class Timer
 {
 public:
-    Timer(std::uint64_t expiration,
-          std::uint64_t interval,
+    Timer(std::chrono::milliseconds expiration,
+          std::chrono::milliseconds interval,
           TimerCallback&& callback) noexcept;
 
     bool isRepeat() const noexcept
     {
-        return interval_ > 0;
+        return interval_ > 0ms;
     }
     
     TimerId id() const noexcept
@@ -30,32 +32,32 @@ public:
         return id_;
     }
 
-    std::uint64_t expiration() const noexcept
+    std::chrono::milliseconds expiration() const noexcept
     {
         return expiration_;
     }
 
-    std::uint64_t interval() const noexcept
+    std::chrono::milliseconds interval() const noexcept
     {
         return interval_;
     }
 
-    void callback() const noexcept
-    {
-        callback_();
-    }
-
-    void resetExpiration(std::uint64_t expiration) noexcept
+    void resetExpiration(std::chrono::milliseconds expiration) noexcept
     {
         expiration_ = expiration + interval_;
+    }
+
+    void run() const noexcept
+    {
+        callback_(id_);
     }
 
 private:
     static TimerId GenerateTimerId() noexcept;
 
     const TimerId id_{};
-    std::uint64_t expiration_{};
-    const std::uint64_t interval_{};
+    std::chrono::milliseconds expiration_{};
+    const std::chrono::milliseconds interval_{};
     const TimerCallback callback_{};
 };
 

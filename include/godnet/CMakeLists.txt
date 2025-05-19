@@ -5,36 +5,36 @@ set(GODNET_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/util/logger.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/util/endian.hpp
 
-    ${CMAKE_CURRENT_SOURCE_DIR}/network/endpoint.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/network/event_channel.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/network/event_loop.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/network/event_loop_thread.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/network/event_loop_thread_pool.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/network/event_poller.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/network/timer.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/network/timer_queue.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/network/socket.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/network/tcp_acceptor.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/network/tcp_socket.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/network/message_buffer.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/net/inet_address.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/net/event_channel.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/net/event_loop.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/net/event_loop_thread.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/net/event_loop_thread_pool.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/net/event_poller.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/net/timer.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/net/timer_queue.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/net/socket.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/net/tcp_acceptor.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/net/tcp_socket.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/net/message_buffer.hpp
 )
 
 set(GODNET_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/util/system.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/util/logger.cpp
 
-    ${CMAKE_CURRENT_SOURCE_DIR}/network/endpoint.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/network/event_channel.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/network/event_loop.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/network/event_loop_thread.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/network/event_loop_thread_pool.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/network/event_poller.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/network/timer.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/network/timer_queue.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/network/socket.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/network/tcp_acceptor.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/network/tcp_socket.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/network/message_buffer.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/net/inet_address.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/net/event_channel.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/net/event_loop.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/net/event_loop_thread.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/net/event_loop_thread_pool.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/net/event_poller.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/net/timer.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/net/timer_queue.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/net/socket.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/net/tcp_acceptor.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/net/tcp_socket.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/net/message_buffer.cpp
 )
 
 add_library(godnet STATIC)

@@ -1,4 +1,4 @@
-#include "godnet/network/event_channel.hpp"
+#include "godnet/net/event_channel.hpp"
 
 #ifdef _WIN32
     #include "wepoll.h"
@@ -8,8 +8,7 @@
 
 #include <cassert>
 
-#include "godnet/network/event_loop.hpp"
-
+#include "godnet/net/event_loop.hpp"
 
 namespace godnet
 {
@@ -18,7 +17,7 @@ const std::uint32_t EventChannel::NONE_EVENT = 0;
 const std::uint32_t EventChannel::READ_EVENT = EPOLLIN | EPOLLPRI;
 const std::uint32_t EventChannel::WRITE_EVENT = EPOLLOUT;
 
-EventChannel::EventChannel(EventLoop* loop, int fd)
+EventChannel::EventChannel(EventLoop* loop, int fd) noexcept
 : loop_(loop), fd_(fd)
 {
     assert(loop);
@@ -27,10 +26,11 @@ EventChannel::EventChannel(EventLoop* loop, int fd)
 
 EventChannel::~EventChannel()
 {
-    assert(!is_handling_);
+    assert(!isHandling_);
+    assert(isNoneEvent());
 }
 
-void EventChannel::updateChannel()
+void EventChannel::updateChannel() noexcept
 {
     loop_->assertInLoopThread();
 
@@ -45,9 +45,9 @@ void EventChannel::handlerEvent()
     {
         return;
     }
-    if (is_bind)
+    if (isBind_)
     {
-        if (auto object = bindObject_.lock())
+        if (std::shared_ptr<void> object = bindObject_.lock())
         {
             handlerEventSafe(); 
         }
@@ -60,7 +60,7 @@ void EventChannel::handlerEvent()
 
 void EventChannel::handlerEventSafe()
 {
-    is_handling_ = true;
+    isHandling_ = true;
     if (eventCallback_)
     {
         eventCallback_();
@@ -94,7 +94,7 @@ void EventChannel::handlerEventSafe()
             writeCallback_();
         }
     }
-    is_handling_ = false;
+    isHandling_ = false;
 }
 
 }

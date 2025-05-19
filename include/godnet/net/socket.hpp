@@ -1,10 +1,10 @@
-#ifndef GODNET_NETWORK_SOCKET_HPP
-#define GODNET_NETWORK_SOCKET_HPP
+#ifndef GODNET_NET_SOCKET_HPP
+#define GODNET_NET_SOCKET_HPP
 
 namespace godnet
 {
 
-class Endpoint;
+class InetAddress;
 
 namespace socket
 {
@@ -17,17 +17,17 @@ int createUdpSocket(int family);
 
 int closeSocket(int sockfd);
 
-int bindAddress(int sockfd, const Endpoint& endpoint);
+int bindAddress(int sockfd, const InetAddress& localAddr);
 
 int listenSocket(int sockfd);
 
-int acceptSocket(int sockfd, Endpoint& endpoint);
+int acceptSocket(int sockfd, InetAddress& localAddr);
 
-int connectSocket(int sockfd, const Endpoint& endpoint);
+int connectSocket(int sockfd, const InetAddress& localAddr);
 
-int getLocalAddr(int sockfd, Endpoint& addr);
+int getLocalAddr(int sockfd, InetAddress& localAddr);
 
-int getPeerAddr(int sockfd, Endpoint& addr);
+int getPeerAddr(int sockfd, InetAddress& peerAddr);
 
 int closeWrite(int sockfd);
 
@@ -41,9 +41,8 @@ int setKeepAlive(int sockfd, bool on);
 
 int getSocketError(int sockfd);
 
-int createTcpSocketPair(int family, int type, int protocol, int fds[2]);
-
 }
+
 }
 
 #endif

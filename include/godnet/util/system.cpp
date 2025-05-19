@@ -36,7 +36,7 @@ int getSystemErrno() noexcept
 #endif
 }
 
-std::string getSystemErrorMessage(int err) noexcept
+std::string getSystemErrnoMessage(int err) noexcept
 {
 #ifdef _WIN32
     char buffer[256];

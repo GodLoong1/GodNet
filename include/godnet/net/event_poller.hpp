@@ -1,5 +1,5 @@
-#ifndef GODNET_NETWORK_EVENT_POLLER_HPP
-#define GODNET_NETWORK_EVENT_POLLER_HPP
+#ifndef GODNET_NET_EVENT_POLLER_HPP
+#define GODNET_NET_EVENT_POLLER_HPP
 
 #include "godnet/util/noncopyable.hpp"
 
@@ -25,11 +25,12 @@ public:
     using EventCallback = std::function<void(std::uint64_t)>;
 #endif
 
-    explicit EventPoller(EventLoop* loop);
+    explicit EventPoller(EventLoop* loop) noexcept;
     ~EventPoller();
 
-    void pollEvents(std::vector<EventChannel*>& readyChannels, int timeout);
-    void updateChannel(EventChannel* channel);
+    void pollEvents(std::vector<EventChannel*>& readyChannels,
+                    int timeout) noexcept;
+    void updateChannel(EventChannel* channel) noexcept;
 
 #ifdef _WIN32
     void postEvent(std::uint64_t event);
@@ -41,7 +42,7 @@ public:
 #endif
 
 private:
-    void ctl(int op, EventChannel* channel);
+    void ctl(int op, EventChannel* channel) noexcept;
 
     EventLoop* loop_;
 #ifdef __linux__

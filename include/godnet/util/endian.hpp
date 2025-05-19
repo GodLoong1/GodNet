@@ -13,19 +13,15 @@
 namespace godnet
 {
 
-namespace detail
-{
+template<typename T>
+constexpr bool is_valid_endian_v = std::disjunction_v<
+    std::is_same<T, std::uint16_t>,
+    std::is_same<T, std::uint32_t>,
+    std::is_same<T, std::uint64_t>
+>;
 
 template<typename T>
-constexpr bool requiredEndianType = std::is_same_v<T, std::uint16_t> |
-                                    std::is_same_v<T, std::uint32_t> |
-                                    std::is_same_v<T, std::uint64_t>;
-
-}
-
-template<typename T, typename =
-    std::enable_if_t<detail::requiredEndianType<T>>>
-inline T hostToNetwork(T val) noexcept
+inline std::enable_if_t<is_valid_endian_v<T>, T> hostToNetwork(T val) noexcept
 {
     if constexpr (std::is_same_v<T, std::uint16_t>)
     {
@@ -46,9 +42,8 @@ inline T hostToNetwork(T val) noexcept
     }
 }
 
-template<typename T, typename =
-    std::enable_if_t<detail::requiredEndianType<T>>>
-inline T networkToHost(T val) noexcept
+template<typename T>
+inline std::enable_if_t<is_valid_endian_v<T>, T> networkToHost(T val) noexcept
 {
     if constexpr (std::is_same_v<T, std::uint16_t>)
     {

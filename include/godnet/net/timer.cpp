@@ -1,4 +1,4 @@
-#include "godnet/network/timer.hpp"
+#include "godnet/net/timer.hpp"
 
 #include <atomic>
 
@@ -11,8 +11,8 @@ TimerId Timer::GenerateTimerId() noexcept
     return ++id;
 }
 
-Timer::Timer(std::uint64_t expiration,
-             std::uint64_t interval,
+Timer::Timer(std::chrono::milliseconds expiration,
+             std::chrono::milliseconds interval,
              TimerCallback&& callback) noexcept
 : id_(GenerateTimerId()),
   expiration_(expiration),

@@ -11,8 +11,14 @@
 #define GODNET_THROW_RUNERR(...) \
     throw godnet::GodNetRunErr(__VA_ARGS__)
 
+#define GODNET_THROW_RUNERR_IF(...) \
+    if (expr) GODNET_THROW_RUNERR(__VA_ARGS__)
+
 #define GODNET_THROW_SYSERR(...) \
     throw godnet::GodNetSysErr(__VA_ARGS__)
+
+#define GODNET_THROW_SYSERR_IF(expr, ...) \
+    if (expr) GODNET_THROW_SYSERR(__VA_ARGS__)
 
 namespace godnet
 {

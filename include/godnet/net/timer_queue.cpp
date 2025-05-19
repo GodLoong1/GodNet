@@ -1,8 +1,9 @@
-#include "godnet/network/timer_queue.hpp"
+#include "godnet/net/timer_queue.hpp"
 
-#include <limits>
+#include <cassert>
+#include <climits>
 
-#include "godnet/network/event_loop.hpp"
+#include "godnet/net/event_loop.hpp"
 
 namespace godnet
 {
@@ -10,13 +11,16 @@ namespace godnet
 TimerQueue::TimerQueue(EventLoop* loop)
 : loop_(loop)
 {
+    assert(loop);
 }
 
-TimerId TimerQueue::addTimer(std::uint64_t expiration,
-                             std::uint64_t interval,
+TimerId TimerQueue::addTimer(std::chrono::steady_clock::time_point expiration,
+                             std::chrono::milliseconds interval,
                              TimerCallback&& callback) noexcept
 {
-    auto timerPtr = std::make_shared<Timer>(expiration,
+    auto timerPtr = std::make_shared<Timer>(std::chrono::duration_cast<
+                                            std::chrono::milliseconds>(
+                                            expiration.time_since_epoch()),
                                             interval,
                                             std::move(callback));
     if (loop_->isInLoopThread())
@@ -46,42 +50,54 @@ void TimerQueue::delTimer(TimerId id) noexcept
     }
 }
 
-int TimerQueue::getNextTimeout(std::uint64_t timeout)
-{
-    if (!timers_.empty())
-    {
-        const auto& timerPtr = timers_.top();
-        if (timerPtr->expiration() <= timeout)
-        {
-            return 0;
-        }
-        std::uint64_t diff = timerPtr->expiration() - timeout;
-        if (diff > std::numeric_limits<int>::max())
-        {
-            diff = std::numeric_limits<int>::max();
-        }
-        return static_cast<int>(diff);
-    }
-    return -1;
-}
-
-void TimerQueue::handlerTimer(std::uint64_t timeout)
+int TimerQueue::getNextTimeout() noexcept
 {
     loop_->assertInLoopThread();
+
+    if (timers_.empty())
+    {
+        return -1;
+    }
+
+    auto timeout =
+        std::chrono::duration_cast<std::chrono::milliseconds>(
+            std::chrono::steady_clock::now().time_since_epoch());
+
+    const auto& timerPtr = timers_.top();
+    if (timerPtr->expiration() <= timeout)
+    {
+        return 0;
+    }
+
+    std::uint64_t diff = (timeout - timerPtr->expiration()).count();
+    if (diff > std::numeric_limits<int>::max())
+    {
+        diff = std::numeric_limits<int>::max();
+    }
+    return static_cast<int>(diff);
+}
+
+void TimerQueue::handlerTimer()
+{
+    loop_->assertInLoopThread();
+
+    auto timeout =
+        std::chrono::duration_cast<std::chrono::milliseconds>(
+            std::chrono::steady_clock::now().time_since_epoch());
 
     auto expireds = getExpiredTimers(timeout);
     for (const auto& timerPtr : expireds)
     {
         if (timerIds_.find(timerPtr->id()) != timerIds_.end())
         {
-            timerPtr->callback();
+            timerPtr->run();
         }
     }
     resetExpiredTimers(expireds, timeout);
 }
 
 std::vector<TimerPtr> TimerQueue::getExpiredTimers(
-    std::uint64_t timeout) noexcept
+    std::chrono::milliseconds timeout) noexcept
 {
     loop_->assertInLoopThread();
 
@@ -104,7 +120,7 @@ std::vector<TimerPtr> TimerQueue::getExpiredTimers(
 
 void TimerQueue::resetExpiredTimers(
     const std::vector<TimerPtr>& expiredTimers,
-    std::uint64_t timeout) noexcept
+    std::chrono::milliseconds timeout) noexcept
 {
     loop_->assertInLoopThread();
 
@@ -137,7 +153,8 @@ void TimerQueue::delTimerInLoop(TimerId id) noexcept
 {
     loop_->assertInLoopThread();
 
-    timerIds_.erase(id);
+    [[maybe_unused]] auto ret = timerIds_.erase(id);
+    assert(ret);
 }
 
 }

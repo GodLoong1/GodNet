@@ -1,24 +1,22 @@
-#include "godnet/network/event_loop_thread.hpp"
+#include "godnet/net/event_loop_thread.hpp"
 
 #include <cassert>
 
 #include "godnet/util/system.hpp"
-#include "godnet/network/event_loop.hpp"
+#include "godnet/net/event_loop.hpp"
 
 namespace godnet
 {
 
 EventLoopThread::~EventLoopThread()
 {
-    stop();
+    assert(!thread_.joinable());
 }
 
 void EventLoopThread::start() noexcept
 {
     assert(!thread_.joinable());
     thread_ = std::thread([this] {
-        system::setThreadName(name_);
-
         EventLoop loop;
         loop.queueInLoop([this, &loop]{
             loop_.store(&loop, std::memory_order_release);
@@ -37,18 +35,15 @@ void EventLoopThread::start() noexcept
 void EventLoopThread::stop() noexcept
 {
     EventLoop* loopPtr = loop_.load(std::memory_order_acquire);
-    if (loopPtr)
-    {
-        assert(loopPtr->threadId() != system::getThreadId());
-        loopPtr->stop();
-    }
-    if (thread_.joinable())
-    {
-        thread_.join();
-    }
+    assert(loopPtr);
+    assert(loopPtr->threadId() != system::getThreadId());
+    loopPtr->stop();
+
+    assert(thread_.joinable());
+    thread_.join();
 }
 
-EventLoop* EventLoopThread::getLoop() noexcept
+EventLoop* EventLoopThread::getLoop() const noexcept
 {
     assert(loop_);
     return loop_.load(std::memory_order_acquire);

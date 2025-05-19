@@ -1,23 +1,15 @@
-#include "godnet/network/endpoint.hpp"
+#include "godnet/net/inet_address.hpp"
 
 #include "fmt/core.h"
 
-#include "godnet/util/exception.hpp"
 #include "godnet/util/endian.hpp"
 
 namespace godnet
 {
 
-Endpoint::Endpoint() noexcept
-{
-    addr_.v4.sin_family = AF_INET;
-    addr_.v4.sin_port = 0;
-    addr_.v4.sin_addr.s_addr = INADDR_ANY;
-}
-
-Endpoint::Endpoint(std::uint16_t port,
-                   bool loopback,
-                   bool ipv6) noexcept
+InetAddress::InetAddress(std::uint16_t port,
+                         bool loopback,
+                         bool ipv6) noexcept
 {
     if (ipv6)
     {
@@ -33,9 +25,9 @@ Endpoint::Endpoint(std::uint16_t port,
     }
 }
 
-Endpoint::Endpoint(std::string_view ip,
-                   std::uint16_t port,
-                   bool ipv6)
+InetAddress::InetAddress(std::string_view ip,
+                         std::uint16_t port,
+                         bool ipv6) noexcept
 {
     if (ipv6)
     {
@@ -43,7 +35,6 @@ Endpoint::Endpoint(std::string_view ip,
         {
             addr_.v6.sin6_family = AF_INET6;
             addr_.v6.sin6_port = hostToNetwork(port);
-            return;
         }
     }
     else
@@ -52,13 +43,33 @@ Endpoint::Endpoint(std::string_view ip,
         {
             addr_.v4.sin_family = AF_INET;
             addr_.v4.sin_port = hostToNetwork(port);
-            return;
         }
     }
-    GODNET_THROW_RUNERR("invalid ip: {}", ip);
 }
 
-std::string Endpoint::toIp() const noexcept
+bool InetAddress::isAny() const noexcept
+{
+    if (isV4())
+    {
+        return addr_.v4.sin_addr.s_addr == INADDR_ANY;
+    }
+    return std::memcmp(&addr_.v6.sin6_addr,
+                       &in6addr_any,
+                       sizeof(addr_.v6.sin6_addr)) == 0;
+}
+
+bool InetAddress::isLoopback() const noexcept
+{
+    if (isV4())
+    {
+        return addr_.v4.sin_addr.s_addr == INADDR_LOOPBACK;
+    }
+    return std::memcmp(&addr_.v6.sin6_addr,
+                       &in6addr_loopback,
+                       sizeof(addr_.v6.sin6_addr)) == 0;
+}
+
+std::string InetAddress::toIp() const noexcept
 {
     char buffer[INET6_ADDRSTRLEN]{};
     if (isV4())
@@ -72,7 +83,7 @@ std::string Endpoint::toIp() const noexcept
     return buffer;
 }
 
-std::uint16_t Endpoint::toPort() const noexcept
+std::uint16_t InetAddress::toPort() const noexcept
 {
     if (isV4())
     {
@@ -81,7 +92,7 @@ std::uint16_t Endpoint::toPort() const noexcept
     return networkToHost(addr_.v6.sin6_port);
 }
 
-std::string Endpoint::toIpPort() const noexcept
+std::string InetAddress::toIpPort() const noexcept
 {
     return fmt::format("{}:{}", toIp(), toPort());
 }

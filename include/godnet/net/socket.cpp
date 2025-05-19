@@ -1,5 +1,4 @@
-#include "godnet/network/socket.hpp"
-
+#include "godnet/net/socket.hpp"
 
 #ifdef __linux__
     #include <unistd.h>
@@ -11,8 +10,7 @@
     #include <ws2tcpip.h>
 #endif
 
-
-#include "godnet/network/endpoint.hpp"
+#include "godnet/net/inet_address.hpp"
 
 namespace godnet::socket
 {
@@ -78,7 +76,7 @@ int closeSocket(int sockfd)
 #endif
 }
 
-int bindAddress(int sockfd, const Endpoint& endpoint)
+int bindAddress(int sockfd, const InetAddress& endpoint)
 {
     return ::bind(sockfd, endpoint.getSockAddr(), endpoint.getSockLen());
 }
@@ -88,7 +86,7 @@ int listenSocket(int sockfd)
     return ::listen(sockfd, SOMAXCONN);
 }
 
-int acceptSocket(int sockfd, Endpoint& endpoint)
+int acceptSocket(int sockfd, InetAddress& endpoint)
 {
     socklen_t socklen = endpoint.getSockLen();
 #ifdef __linux__
@@ -104,7 +102,7 @@ int acceptSocket(int sockfd, Endpoint& endpoint)
 }
 
 
-int connectSocket(int sockfd, const Endpoint& endpoint)
+int connectSocket(int sockfd, const InetAddress& endpoint)
 {
 #ifdef __linux__
     return ::connect(sockfd,
@@ -117,7 +115,7 @@ int connectSocket(int sockfd, const Endpoint& endpoint)
 #endif
 }
 
-int getLocalAddr(int sockfd, Endpoint& endpoint)
+int getLocalAddr(int sockfd, InetAddress& endpoint)
 {
     socklen_t socklen = endpoint.getSockLen();
     return ::getsockname(sockfd,
@@ -125,7 +123,7 @@ int getLocalAddr(int sockfd, Endpoint& endpoint)
                          &socklen);
 }
 
-int getPeerAddr(int sockfd, Endpoint& endpoint)
+int getPeerAddr(int sockfd, InetAddress& endpoint)
 {
     socklen_t socklen = endpoint.getSockLen();
     return ::getpeername(sockfd,
@@ -216,73 +214,6 @@ int getSocketError(int sockfd)
 #endif
     }
     return optval;
-}
-
-int createTcpSocketPair(int family, int fds[2])
-{
-    if (family != AF_INET || family != AF_INET6)
-    {
-        return -1;
-    }
-#ifdef __linux__
-    return ::socketpair(family,
-                        SOCK_STREAM | SOCK_NONBLOCK | SOCK_CLOEXEC,
-                        0,
-                        fds);
-#else
-    int listenfd = -1, connfd = -1, acceptfd = -1;
-    Endpoint localaddr(0, true, family == AF_INET6);
-
-    listenfd = createTcpSocket(family);
-    if (listenfd < 0)
-    {
-        goto error;
-    }
-    if (bindAddress(listenfd, localaddr) < 0)
-    {
-        goto error;
-    }
-    if (listenSocket(listenfd) < 0)
-    {
-        goto error;
-    }
-    if (getLocalAddr(listenfd, localaddr) < 0)
-    {
-        goto error;
-    }
-    connfd = createTcpSocket(family);
-    if (connfd < 0)
-    {
-        goto error;
-    }
-    if (connectSocket(connfd, localaddr))
-    {
-        goto error;
-    }
-    acceptfd = acceptSocket(listenfd, localaddr);
-    if (acceptfd < 0)
-    {
-        goto error;
-    }
-    closeSocket(listenfd);
-    fds[0] = connfd;
-    fds[1] = acceptfd;
-    return 0;
-error:
-    if (listenfd >= 0)
-    {
-        closeSocket(listenfd);
-    }
-    if (connfd >= 0)
-    {
-        closeSocket(connfd);
-    }
-    if (acceptfd >= 0)
-    {
-        closeSocket(acceptfd);
-    }
-    return -1;
-#endif
 }
 
 }

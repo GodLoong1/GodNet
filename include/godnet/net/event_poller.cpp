@@ -1,4 +1,4 @@
-#include "godnet/network/event_poller.hpp"
+#include "godnet/net/event_poller.hpp"
 
 #ifdef _WIN32
     #include "wepoll.h"
@@ -9,13 +9,15 @@
 
 #include <cassert>
 
-#include "godnet/network/event_loop.hpp"
-#include "godnet/network/event_channel.hpp"
+#include "godnet/util/system.hpp"
+#include "godnet/util/logger.hpp"
+#include "godnet/net/event_loop.hpp"
+#include "godnet/net/event_channel.hpp"
 
 namespace godnet
 {
 
-EventPoller::EventPoller(EventLoop* loop)
+EventPoller::EventPoller(EventLoop* loop) noexcept
 : loop_(loop),
   events_(32)
 {
@@ -33,15 +35,19 @@ EventPoller::~EventPoller()
 #ifdef __linux__
     ::close(epollFd_);
 #else
-    epoll_close(epollFd_);
+    ::epoll_close(epollFd_);
 #endif
 }
 
-void EventPoller::pollEvents(std::vector<EventChannel*>& readyChannels, int timeout)
+void EventPoller::pollEvents(std::vector<EventChannel*>& readyChannels,
+                             int timeout) noexcept
 {
     loop_->assertInLoopThread();
 
-    int ready = ::epoll_wait(epollFd_, events_.data(), static_cast<int>(events_.size()), timeout);
+    int ready = ::epoll_wait(epollFd_,
+                             events_.data(),
+                             static_cast<int>(events_.size()),
+                             timeout);
     if (ready > 0)
     {
         if (ready == static_cast<int>(events_.size()))
@@ -65,9 +71,15 @@ void EventPoller::pollEvents(std::vector<EventChannel*>& readyChannels, int time
             readyChannels.emplace_back(channel);
         }
     }
+    else if (ready < 0)
+    {
+        GODNET_LOG_ERROR("epoll_wait loopThreadId: {}, faild: {}",
+            loop_->threadId(),
+            system::getSystemErrnoMessage());
+    }
 }
 
-void EventPoller::updateChannel(EventChannel* channel)
+void EventPoller::updateChannel(EventChannel* channel) noexcept
 {
     loop_->assertInLoopThread();
 
@@ -91,19 +103,27 @@ void EventPoller::updateChannel(EventChannel* channel)
 }
 
 #ifdef _WIN32
-void EventPoller::postEvent(std::uint64_t event)
+void EventPoller::postEvent(std::uint64_t event) noexcept
 {
-    epoll_post_event(epollFd_, event);
+    loop_->assertInLoopThread();
+
+    ::epoll_post_event(epollFd_, event);
 }
 #endif
 
-void EventPoller::ctl(int op, EventChannel* channel)
+void EventPoller::ctl(int op, EventChannel* channel) noexcept
 {
     struct epoll_event ev{};
     ev.data.ptr = channel;
     ev.events = channel->events();
 
-    ::epoll_ctl(epollFd_, op, channel->fd(), &ev);
+    if (::epoll_ctl(epollFd_, op, channel->fd(), &ev) < 0)
+    {
+        GODNET_LOG_ERROR("epoll_ctl loopThreadId: {}, channelFd: {}, faild: {}",
+            loop_->threadId(),
+            channel->fd(),
+            system::getSystemErrnoMessage());
+    }
 }
 
 }

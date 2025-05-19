@@ -1,4 +1,4 @@
-#include "godnet/network/message_buffer.hpp"
+#include "godnet/net/message_buffer.hpp"
 
 #include <cstring>
 #include <cassert>

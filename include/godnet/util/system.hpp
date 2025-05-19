@@ -11,7 +11,7 @@ std::uint64_t getThreadId() noexcept;
 
 int getSystemErrno() noexcept;
 
-std::string getSystemErrorMessage(int err) noexcept;
+std::string getSystemErrnoMessage(int err = getSystemErrno()) noexcept;
 
 void setThreadName(const std::string& name) noexcept;
 
