@@ -108,6 +108,42 @@ int connect(int sockfd, const InetAddress& localAddr) noexcept
                      localAddr.getSockLen());
 }
 
+std::int64_t read(int sockfd, char* buf[2], std::size_t len[2],
+                  std::size_t count)
+{
+#ifdef __linux__
+    struct iovec iov[2];
+    iov[0].iov_base = buf[0];
+    iov[0].iov_len = len[0];
+    iov[1].iov_base = buf[1];
+    iov[1].iov_len = len[1];
+    return ::readv(sockfd, iov, count);
+#else
+    std::int64_t ret = 0;
+    for (std::size_t i = 0; i != count; ++i)
+    {
+        std::int64_t n = ::recv(sockfd_, buf[i], len[i], 0);
+        if (n == len[i])
+        {
+            ret += n;
+        }
+        else
+        {
+            if (n < 0)
+            {
+                ret = (ret == 0 ? n : ret);
+            }
+            else
+            {
+                ret += n;
+            }
+            break;
+        }
+    }
+    return ret;
+#endif
+}
+
 std::int64_t write(int sockfd, const char* buf, std::size_t len)
 {
 #ifdef __linux__

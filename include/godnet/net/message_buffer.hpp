@@ -41,6 +41,11 @@ public:
         return write_;
     }
 
+    char* mutWritePeek() noexcept
+    {
+        return write_;
+    }
+
     bool empty() const noexcept
     {
         return read_ == write_;
@@ -81,6 +86,8 @@ public:
     void retrieve(std::size_t len) noexcept;
     void retrieveUntil(const char* end) noexcept;
     void retrieveAll() noexcept;
+
+    void advanceWrite(std::size_t len) noexcept;
 
 private:
     void reallocate(std::size_t length) noexcept;

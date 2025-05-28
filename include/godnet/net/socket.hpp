@@ -33,7 +33,8 @@ int accept(int sockfd, InetAddress& peerAddr) noexcept;
 int connect(int sockfd, const InetAddress& localAddr) noexcept;
 
 // Tcp读
-std::int64_t readv(const char* buf, std::size_t len);
+std::int64_t read(int sockfd, char* buf[2], std::size_t len[2],
+                  std::size_t count);
 
 // Tcp写
 std::int64_t write(int sockfd, const char* buf, std::size_t len);

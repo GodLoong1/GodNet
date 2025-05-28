@@ -157,6 +157,12 @@ void MessageBuffer::retrieveAll() noexcept
     write_ = start_;
 }
 
+void MessageBuffer::advanceWrite(std::size_t len) noexcept
+{
+    assert(len <= writeByte());
+    write_ += len;
+}
+
 void MessageBuffer::reallocate(std::size_t length) noexcept
 {
     const std::size_t readSize = readByte();

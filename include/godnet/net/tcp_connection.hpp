@@ -33,20 +33,21 @@ class TcpConnection : public std::enable_shared_from_this<TcpConnection>,
 public:
     TcpConnection(EventLoop* loop,
                   int sockfd,
-                  const InetAddress& localAddr,
                   const InetAddress& peerAddr);
     ~TcpConnection();
 
+    void init();
     void shutdown();
-
     void forceClose();
 
     void send(const char* buf, std::size_t len);
     void send(const std::string& buf);
     void send(std::string&& buf);
     void send(const MessageBuffer& buf);
+    void sendInLoop(const char* buf, std::size_t len);
 
 private:
+    void initInLoop();
     void shutdownInLoop();
     void forceCloseInLoop();
 
@@ -76,8 +77,8 @@ private:
     TcpMessageCallback messageCallback_;
     TcpCloseCallback closeCallback_;
 
-    MessageBuffer inputBuffer_;
-    MessageBuffer outputBuffer_;
+    MessageBuffer readBuffer_;
+    MessageBuffer writeBuffer_;
     std::any context_;
 };
 

@@ -7,15 +7,6 @@
 namespace godnet
 {
 
-#ifdef _WIN32
-#include <cstddef>
-struct iovec
-{
-    void* iov_base;
-    std::size_t iov_len;
-};
-#endif
-
 class TcpSocket : Noncopyable
 {
 public:
@@ -41,7 +32,7 @@ public:
     bool forceClose();
 
     // 读取数据
-    std::int64_t readv(const struct iovec* iov, int count);
+    std::int64_t read(char* buf[2], std::size_t len[2], std::size_t count);
 
     // 写入数据
     std::int64_t write(const char* buf, std::size_t len);

@@ -82,50 +82,20 @@ bool TcpSocket::forceClose()
     return true;
 }
 
-std::int64_t TcpSocket::readv(const struct iovec* iov, int count)
+std::int64_t TcpSocket::read(char* buf[2], std::size_t len[2], std::size_t count)
 {
-#ifdef __linux__
-    return ::readv(sockfd_, iov, count);
-#else
-    std::int64_t ret = 0;
-    for (int i = 0; i < count; ++i)
-    {
-        std::int64_t n = ::recv(sockfd_, iov[i].iov_base, iov[i].iov_len, 0);
-        if (n == iov[i].iov_len)
-        {
-            ret += n;
-        }
-        else
-        {
-            if (n < 0)
-            {
-                ret = (ret == 0 ? n : ret);
-            }
-            else
-            {
-                ret += n;
-            }
-            break;
-        }
-    }
-    return ret;
-#endif
+    return socket::read(sockfd_, buf, len, count);
 }
 
 std::int64_t TcpSocket::write(const char* buf, std::size_t len)
 {
-#ifdef __linux__
-    return ::write(sockfd_, buf, len);
-#else
-    return ::send(sockfd_, buf, len, 0);
-#endif
+    return socket::write(sockfd_, buf, len);
 }
 
 InetAddress TcpSocket::getLocalAddr()
 {
     InetAddress localAddr;
-    socklen_t socklen = localAddr.getSockLen();
-    if (::getsockname(sockfd_, localAddr.mutSockAddr(), &socklen) < 0)
+    if (socket::getLocalAddr(sockfd_, localAddr) < 0)
     {
         GODNET_LOG_ERROR("getsockname() sockfd: {}, faild: {}",
             sockfd_,
