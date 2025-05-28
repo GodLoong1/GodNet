@@ -13,7 +13,7 @@ namespace godnet
 class MessageBuffer : Noncopyable
 {
 public:
-    explicit MessageBuffer(std::size_t length) noexcept;
+    explicit MessageBuffer(std::size_t length = 1024) noexcept;
     ~MessageBuffer();
 
     std::size_t headByte() const noexcept

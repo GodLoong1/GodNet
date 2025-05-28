@@ -84,6 +84,11 @@ public:
         return family() == AF_INET6;
     }
 
+    bool isValid() const noexcept
+    {
+        return isV4() || isV6();
+    }
+
     const struct sockaddr* getSockAddr() const noexcept
     {
         return &addr_.base;
@@ -94,18 +99,9 @@ public:
         return &addr_.base;
     }
 
-    std::size_t getSockLen() const noexcept 
+    socklen_t getSockLen() const noexcept 
     {
-        return isV4() ? sizeof(addr_.v4) : sizeof(addr_.v6);
-    }
-
-    bool valid() const noexcept
-    {
-        if (family() != AF_INET || family() != AF_INET6)
-        {
-            return true;
-        }
-        return false;
+        return sizeof(addr_);
     }
 
     bool isAny() const noexcept;

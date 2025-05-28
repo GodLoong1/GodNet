@@ -5,17 +5,16 @@
     #include <netinet/in.h>
     #include <netinet/tcp.h>
     #include <fcntl.h>
+    #include <sys/uio.h>
 #else
     #include <winsock2.h>
     #include <ws2tcpip.h>
 #endif
 
-#include "godnet/net/inet_address.hpp"
-
 namespace godnet::socket
 {
 
-void setSocketNonBlock(int sockfd) noexcept
+void setNonBlock(int sockfd) noexcept
 {
 #ifdef __linux__
     int flags = ::fcntl(sockfd, F_GETFL, 0);
@@ -31,7 +30,7 @@ void setSocketNonBlock(int sockfd) noexcept
 #endif
 }
 
-int createTcpSocket(int family) noexcept
+int tcpSocket(int family) noexcept
 {
 #ifdef __linux__
     return ::socket(family,
@@ -49,7 +48,7 @@ int createTcpSocket(int family) noexcept
 #endif
 }
 
-int createUdpSocket(int family) noexcept
+int udpSocket(int family) noexcept
 {
 #ifdef __linux__
     return ::socket(family,
@@ -76,62 +75,65 @@ int closeSocket(int sockfd) noexcept
 #endif
 }
 
-int bindAddress(int sockfd, const InetAddress& endpoint) noexcept
+int bind(int sockfd, const InetAddress& localAddr) noexcept
 {
-    return ::bind(sockfd, endpoint.getSockAddr(), endpoint.getSockLen());
+    return ::bind(sockfd, localAddr.getSockAddr(), localAddr.getSockLen());
 }
 
-int listenSocket(int sockfd) noexcept
+int listen(int sockfd) noexcept
 {
     return ::listen(sockfd, SOMAXCONN);
 }
 
-int acceptSocket(int sockfd, InetAddress& endpoint) noexcept
+int accept(int sockfd, InetAddress& peerAddr) noexcept
 {
-    socklen_t socklen = endpoint.getSockLen();
+    socklen_t socklen = peerAddr.getSockLen();
 #ifdef __linux__
     return ::accept4(sockfd,
-                     endpoint.mutSockAddr(),
+                     peerAddr.mutSockAddr(),
                      &socklen,
                      SOCK_NONBLOCK | SOCK_CLOEXEC);
 #else
     return ::accept(sockfd,
-                    endpoint.mutSockAddr(),
+                    peerAddr.mutSockAddr(),
                     &socklen);
 #endif
 }
 
 
-int connectSocket(int sockfd, const InetAddress& endpoint) noexcept
+int connect(int sockfd, const InetAddress& localAddr) noexcept
+{
+    return ::connect(sockfd,
+                     localAddr.getSockAddr(),
+                     localAddr.getSockLen());
+}
+
+std::int64_t write(int sockfd, const char* buf, std::size_t len)
 {
 #ifdef __linux__
-    return ::connect(sockfd,
-                     endpoint.getSockAddr(),
-                     endpoint.getSockLen());
+    return ::write(sockfd, buf, len);
 #else
-    return ::connect(sockfd,
-                     endpoint.getSockAddr(),
-                     endpoint.getSockLen());
+    return ::send(sockfd, buf, len, 0);
 #endif
 }
 
-int getLocalAddr(int sockfd, InetAddress& endpoint) noexcept
+int getLocalAddr(int sockfd, InetAddress& localAddr) noexcept
 {
-    socklen_t socklen = endpoint.getSockLen();
+    socklen_t socklen = localAddr.getSockLen();
     return ::getsockname(sockfd,
-                         endpoint.mutSockAddr(),
+                         localAddr.mutSockAddr(),
                          &socklen);
 }
 
-int getPeerAddr(int sockfd, InetAddress& endpoint) noexcept
+int getPeerAddr(int sockfd, InetAddress& peerAddr) noexcept
 {
-    socklen_t socklen = endpoint.getSockLen();
+    socklen_t socklen = peerAddr.getSockLen();
     return ::getpeername(sockfd,
-                         endpoint.mutSockAddr(),
+                         peerAddr.mutSockAddr(),
                          &socklen);
 }
 
-int closeWrite(int sockfd) noexcept
+int shutdown(int sockfd) noexcept
 {
 #ifdef __linux__
     return ::shutdown(sockfd, SHUT_WR);

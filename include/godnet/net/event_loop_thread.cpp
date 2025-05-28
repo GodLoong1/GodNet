@@ -1,6 +1,7 @@
 #include "godnet/net/event_loop_thread.hpp"
 
 #include <cassert>
+#include <future>
 
 #include "godnet/util/system.hpp"
 #include "godnet/net/event_loop.hpp"
@@ -16,20 +17,22 @@ EventLoopThread::~EventLoopThread()
 void EventLoopThread::start() noexcept
 {
     assert(!thread_.joinable());
-    thread_ = std::thread([this] {
+
+    std::promise<void> promise = std::promise<void>();
+    std::future<void> future = promise.get_future();
+
+    thread_ = std::thread([this, &promise] {
         EventLoop loop;
-        loop.queueInLoop([this, &loop]{
+        loop.queueInLoop([this, &loop, &promise]{
             loop_.store(&loop, std::memory_order_release);
+            promise.set_value();
         });
 
         loop.start();
         loop_.store(nullptr, std::memory_order_release);
     });
 
-    while (!loop_.load(std::memory_order_acquire))
-    {
-        std::this_thread::yield();
-    }
+    future.get();
 }
 
 void EventLoopThread::stop() noexcept

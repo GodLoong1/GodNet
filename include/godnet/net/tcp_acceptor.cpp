@@ -16,9 +16,9 @@ TcpAcceptor::TcpAcceptor(EventLoop* loop, const InetAddress& localAddr) noexcept
   localAddr_(localAddr)
 {
     assert(loop);
-    assert(localAddr.valid());
+    assert(localAddr.isValid());
 
-    int sockfd = socket::createTcpSocket(localAddr.family());
+    int sockfd = socket::tcpSocket(localAddr.family());
     assert(sockfd >= 0);
 
     socket_ = std::make_unique<TcpSocket>(sockfd);

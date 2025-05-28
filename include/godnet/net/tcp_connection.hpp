@@ -3,11 +3,12 @@
 
 #include <memory>
 #include <functional>
+#include <any>
 
-#include "godnet/network/event_channel.hpp"
-#include "godnet/network/message_buffer.hpp"
-#include "godnet/network/tcp_socket.hpp"
 #include "godnet/util/noncopyable.hpp"
+#include "godnet/net/event_channel.hpp"
+#include "godnet/net/message_buffer.hpp"
+#include "godnet/net/tcp_socket.hpp"
 
 namespace godnet
 {
@@ -32,9 +33,27 @@ class TcpConnection : public std::enable_shared_from_this<TcpConnection>,
 public:
     TcpConnection(EventLoop* loop,
                   int sockfd,
-                  const Endpoint& localEndpoint,
-                  const Endpoint& peerEndpoint);
+                  const InetAddress& localAddr,
+                  const InetAddress& peerAddr);
     ~TcpConnection();
+
+    void shutdown();
+
+    void forceClose();
+
+    void send(const char* buf, std::size_t len);
+    void send(const std::string& buf);
+    void send(std::string&& buf);
+    void send(const MessageBuffer& buf);
+
+private:
+    void shutdownInLoop();
+    void forceCloseInLoop();
+
+    void handleRead();
+    void handleWrite();
+    void handleClose();
+    void handleError();
 
 private:
     enum class Status : std::uint8_t
@@ -48,13 +67,18 @@ private:
     EventLoop* loop_;
     TcpSocket socket_;
     std::unique_ptr<EventChannel> channel_;
-    Endpoint localEndpoint_;
-    Endpoint peerEndpoint_;
     Status status_{Status::disconnected};
 
-    TcpConnectionCallback connectionCallback_{};
-    TcpMessageCallback messageCallback_{};
-    TcpCloseCallback closeCallback_{};
+    InetAddress localAddr_;
+    InetAddress peerAddr_;
+
+    TcpConnectionCallback connectionCallback_;
+    TcpMessageCallback messageCallback_;
+    TcpCloseCallback closeCallback_;
+
+    MessageBuffer inputBuffer_;
+    MessageBuffer outputBuffer_;
+    std::any context_;
 };
 
 }

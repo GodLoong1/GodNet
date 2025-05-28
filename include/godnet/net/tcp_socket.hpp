@@ -7,6 +7,15 @@
 namespace godnet
 {
 
+#ifdef _WIN32
+#include <cstddef>
+struct iovec
+{
+    void* iov_base;
+    std::size_t iov_len;
+};
+#endif
+
 class TcpSocket : Noncopyable
 {
 public:
@@ -31,11 +40,17 @@ public:
     // 强制关闭
     bool forceClose();
 
+    // 读取数据
+    std::int64_t readv(const struct iovec* iov, int count);
+
+    // 写入数据
+    std::int64_t write(const char* buf, std::size_t len);
+
     // 获取本端地址
-    InetAddress getLocalEndpoint();
+    InetAddress getLocalAddr();
 
     // 获取对端地址
-    InetAddress getPeerEndpoint();
+    InetAddress getPeerAddr();
 
     // 设置Nagle算法
     bool setTcpNoDelay(bool on);
