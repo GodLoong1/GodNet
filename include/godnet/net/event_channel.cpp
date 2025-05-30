@@ -41,13 +41,9 @@ void EventChannel::handlerEvent()
 {
     loop_->assertInLoopThread();
 
-    if (isNoneEvent())
-    {
-        return;
-    }
     if (isBind_)
     {
-        if (std::shared_ptr<void> object = bindObject_.lock())
+        if (auto object = bindObject_.lock())
         {
             handlerEventSafe(); 
         }
@@ -60,6 +56,8 @@ void EventChannel::handlerEvent()
 
 void EventChannel::handlerEventSafe()
 {
+    loop_->assertInLoopThread();
+
     isHandling_ = true;
     if (eventCallback_)
     {

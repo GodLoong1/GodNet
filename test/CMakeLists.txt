@@ -27,3 +27,6 @@ target_link_libraries(event_loop_thread_test PRIVATE godnet-core-interface PUBLI
 
 add_executable(event_loop_thread_pool_test event_loop_thread_pool_test.cpp)
 target_link_libraries(event_loop_thread_pool_test PRIVATE godnet-core-interface PUBLIC godnet)
+
+add_executable(tcp_server_test tcp_server_test.cpp)
+target_link_libraries(tcp_server_test PRIVATE godnet-core-interface PUBLIC godnet)

@@ -6,18 +6,16 @@
 #include <cstddef>
 
 #include "godnet/util/noncopyable.hpp"
+#include "godnet/net/event_loop.hpp"
+#include "godnet/net/event_loop_thread.hpp"
 
 namespace godnet
 {
-
-class EventLoop;
-class EventLoopThread;
 
 class EventLoopThreadPool : public Noncopyable
 {
 public:
     explicit EventLoopThreadPool(std::size_t threadNum) noexcept;
-    ~EventLoopThreadPool();
 
     void start() noexcept;
     void stop() noexcept;

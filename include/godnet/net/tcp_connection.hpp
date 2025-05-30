@@ -5,6 +5,7 @@
 #include <functional>
 #include <any>
 
+#include "godnet/net/inet_address.hpp"
 #include "godnet/util/noncopyable.hpp"
 #include "godnet/net/event_channel.hpp"
 #include "godnet/net/message_buffer.hpp"
@@ -45,6 +46,31 @@ public:
     void send(std::string&& buf);
     void send(const MessageBuffer& buf);
     void sendInLoop(const char* buf, std::size_t len);
+
+    void setConnectionCallback(const TcpConnectionCallback& callback)
+    {
+        connectionCallback_ = std::move(callback);
+    }
+
+    void setMessageCallback(const TcpMessageCallback& callback)
+    {
+        messageCallback_ = std::move(callback);
+    }
+
+    void setCloseCallback(TcpCloseCallback&& callback)
+    {
+        closeCallback_ = std::move(callback);
+    }
+
+    const InetAddress& getLocalAddr() const noexcept
+    {
+        return localAddr_;
+    }
+
+    const InetAddress& getPeerAddr() const noexcept
+    {
+        return peerAddr_;
+    }
 
 private:
     void initInLoop();

@@ -1,4 +1,5 @@
 #include "godnet/net/tcp_server.hpp"
+#include "godnet/net/tcp_acceptor.hpp"
 
 #include <cassert>
 
@@ -9,6 +10,14 @@ TcpServer::TcpServer(EventLoop* loop, const InetAddress& listenAddr)
 : loop_(loop),
   acceptor_(std::make_unique<TcpAcceptor>(loop, listenAddr))
 {
+}
+
+TcpServer::~TcpServer()
+{
+    if (loopPool_)
+    {
+        loopPool_->stop();
+    }
 }
 
 void TcpServer::start()
@@ -60,7 +69,16 @@ void TcpServer::newConnection(int sockfd, const InetAddress& peerAddr)
     {
         ioLoop = loopPool_->getNextLoop();
     }
+
     auto conn = std::make_shared<TcpConnection>(ioLoop, sockfd, peerAddr);
+    conn->setConnectionCallback(connectionCallback_);
+    conn->setMessageCallback(messageCallback_);
+    conn->setCloseCallback([this](const TcpConnectionPtr& conn) {
+        removeConnection(conn);
+    });
+
+    conn->init();
+    connections_.emplace(std::move(conn));
 }
 
 void TcpServer::removeConnection(const TcpConnectionPtr& conn)

@@ -69,7 +69,7 @@ int TimerQueue::getNextTimeout() noexcept
         return 0;
     }
 
-    std::uint64_t diff = (timeout - timerPtr->expiration()).count();
+    std::uint64_t diff = (timerPtr->expiration() - timeout).count();
     if (diff > std::numeric_limits<int>::max())
     {
         diff = std::numeric_limits<int>::max();

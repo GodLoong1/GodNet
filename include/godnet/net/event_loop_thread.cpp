@@ -4,21 +4,23 @@
 #include <future>
 
 #include "godnet/util/system.hpp"
-#include "godnet/net/event_loop.hpp"
 
 namespace godnet
 {
 
 EventLoopThread::~EventLoopThread()
 {
-    assert(!thread_.joinable());
+    if (thread_.joinable())
+    {
+        stop();
+    }
 }
 
 void EventLoopThread::start() noexcept
 {
     assert(!thread_.joinable());
 
-    std::promise<void> promise = std::promise<void>();
+    std::promise<void> promise;
     std::future<void> future = promise.get_future();
 
     thread_ = std::thread([this, &promise] {

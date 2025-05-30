@@ -131,8 +131,8 @@ public:
 private:
     void handlerEventSafe();
 
-    EventLoop* loop_;
-    int fd_;
+    EventLoop* const loop_;
+    const int fd_;
     std::uint32_t events_{};
     std::uint32_t revents_{};
 

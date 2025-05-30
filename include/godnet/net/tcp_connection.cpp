@@ -20,6 +20,20 @@ TcpConnection::TcpConnection(EventLoop* loop,
     assert(loop);
     assert(localAddr_.isValid());
     assert(peerAddr_.isValid());
+
+    channel_->setReadCallback([this] {
+        handleRead();
+    });
+    channel_->setWriteCallback([this] {
+        handleWrite();
+    });
+    channel_->setCloseCallback([this] {
+        handleClose();
+    });
+    channel_->setErrorCallback([this] {
+        handleError();
+    });
+    socket_.setKeepAlive(true);
 }
 
 TcpConnection::~TcpConnection()

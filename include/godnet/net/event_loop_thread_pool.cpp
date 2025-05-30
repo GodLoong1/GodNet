@@ -2,8 +2,6 @@
 
 #include <cassert>
 
-#include "godnet/net/event_loop_thread.hpp"
-
 namespace godnet
 {
 
@@ -14,11 +12,6 @@ EventLoopThreadPool::EventLoopThreadPool(std::size_t threadNum) noexcept
     {
         loopThreads_.push_back(std::make_unique<EventLoopThread>());
     }
-}
-
-EventLoopThreadPool::~EventLoopThreadPool()
-{
-    assert(loops_.empty());
 }
 
 void EventLoopThreadPool::start() noexcept

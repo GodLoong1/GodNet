@@ -17,10 +17,21 @@ class TcpServer : Noncopyable
 {
 public:
     TcpServer(EventLoop* loop, const InetAddress& listenAddr);
+    ~TcpServer();
 
     void start();
     void startInLoop();
     void stop();
+
+    void setConnectionCallback(TcpConnectionCallback&& callback) noexcept
+    {
+        connectionCallback_ = std::move(callback);
+    }
+
+    void setMessageCallback(TcpMessageCallback&& callback) noexcept
+    {
+        messageCallback_ = std::move(callback);
+    }
 
 private:
     void newConnection(int sockfd, const InetAddress& peerAddr);

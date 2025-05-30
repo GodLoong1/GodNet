@@ -17,6 +17,8 @@ set(GODNET_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/net/tcp_acceptor.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/net/tcp_socket.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/net/message_buffer.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/net/tcp_connection.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/net/tcp_server.hpp
 )
 
 set(GODNET_SOURCES
@@ -35,6 +37,8 @@ set(GODNET_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/net/tcp_acceptor.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/net/tcp_socket.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/net/message_buffer.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/net/tcp_connection.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/net/tcp_server.cpp
 )
 
 add_library(godnet STATIC)

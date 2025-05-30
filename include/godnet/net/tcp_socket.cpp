@@ -1,12 +1,5 @@
 #include "godnet/net/tcp_socket.hpp"
 
-#ifdef __linux__
-    #include <sys/uio.h>
-    #include <unistd.h>
-#else
-    #include <winsock2.h>
-#endif
-
 #include <cassert>
 
 #include "godnet/util/logger.hpp"
