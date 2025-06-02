@@ -9,9 +9,9 @@ namespace godnet::system
 
 std::uint64_t getThreadId() noexcept;
 
-int getSystemErrno() noexcept;
+int getErrno() noexcept;
 
-std::string getSystemErrnoMessage(int err = getSystemErrno()) noexcept;
+std::string getErrnoMsg(int err = getErrno()) noexcept;
 
 }
 

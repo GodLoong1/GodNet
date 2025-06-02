@@ -108,7 +108,7 @@ int connect(int sockfd, const InetAddress& localAddr) noexcept
     int ret = ::connect(sockfd,
                         localAddr.getSockAddr(),
                         localAddr.getSockLen());
-    int err = ret ? system::getSystemErrno() : ret;
+    int err = ret ? system::getErrno() : ret;
     switch (err)
     {
         case 0:

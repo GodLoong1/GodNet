@@ -78,9 +78,7 @@ void TcpAcceptor::handleRead()
     }
     else
     {
-        GODNET_LOG_ERROR("accept fd: {}, fail: {}",
-            socket_->fd(),
-            system::getSystemErrnoMessage());
+        GODNET_LOG_SYSERR("accept sockfd: {}", socket_->fd());
     }
 }
 

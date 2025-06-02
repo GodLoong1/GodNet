@@ -73,9 +73,7 @@ void EventPoller::pollEvents(std::vector<EventChannel*>& readyChannels,
     }
     else if (ready < 0)
     {
-        GODNET_LOG_ERROR("epoll_wait loopThreadId: {}, faild: {}",
-            loop_->threadId(),
-            system::getSystemErrnoMessage());
+        GODNET_LOG_SYSERR("epoll_wait loopThreadId: {}", loop_->threadId());
     }
 }
 
@@ -123,10 +121,9 @@ void EventPoller::ctl(int op, EventChannel* channel) noexcept
 
     if (::epoll_ctl(epollFd_, op, channel->fd(), &ev) < 0)
     {
-        GODNET_LOG_ERROR("epoll_ctl loopThreadId: {}, channelFd: {}, faild: {}",
+        GODNET_LOG_SYSERR("epoll_ctl loopThreadId: {}, channelFd: {}",
             loop_->threadId(),
-            channel->fd(),
-            system::getSystemErrnoMessage());
+            channel->fd());
     }
 }
 
