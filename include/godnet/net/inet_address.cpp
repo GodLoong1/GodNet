@@ -1,5 +1,7 @@
 #include "godnet/net/inet_address.hpp"
 
+#include <cstring>
+
 #include "fmt/core.h"
 
 #include "godnet/util/endian.hpp"
@@ -95,6 +97,29 @@ std::uint16_t InetAddress::toPort() const noexcept
 std::string InetAddress::toIpPort() const noexcept
 {
     return fmt::format("{}:{}", toIp(), toPort());
+}
+
+bool operator==(const InetAddress& localAddr,
+                const InetAddress& peerAddr) noexcept
+{
+    if (&localAddr == &peerAddr)
+    {
+        return true;
+    }
+    if (localAddr.isV4() && peerAddr.isV4())
+    {
+        return localAddr.addr_.v4.sin_addr.s_addr ==
+               peerAddr.addr_.v4.sin_addr.s_addr &&
+               localAddr.addr_.v4.sin_port == peerAddr.addr_.v4.sin_port;
+    }
+    else if (localAddr.isV6() && localAddr.isV6())
+    {
+        return localAddr.addr_.v6.sin6_port == peerAddr.addr_.v6.sin6_port &&
+               std::memcmp(&localAddr.addr_.v6.sin6_addr,
+                           &peerAddr.addr_.v6.sin6_addr,
+                           sizeof(localAddr.addr_.v6.sin6_addr)) == 0;
+    }
+    return false;
 }
 
 }

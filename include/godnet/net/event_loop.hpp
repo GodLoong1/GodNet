@@ -33,12 +33,12 @@ public:
     void runInLoop(EventCallback&& func);
     void queueInLoop(EventCallback&& func) noexcept;
 
-    TimerId runTimer(std::chrono::milliseconds delay,
-                     std::chrono::milliseconds interval,
+    TimerId runTimer(TimerDuration delay,
+                     TimerDuration interval,
                      TimerCallback&& callback) noexcept;
-    TimerId runTimerAfter(std::chrono::milliseconds delay,
+    TimerId runTimerAfter(TimerDuration delay,
                           TimerCallback&& callback) noexcept;
-    TimerId runTimerEvery(std::chrono::milliseconds interval,
+    TimerId runTimerEvery(TimerDuration interval,
                           TimerCallback&& callback) noexcept;
     void cancelTimer(TimerId id) noexcept;
 

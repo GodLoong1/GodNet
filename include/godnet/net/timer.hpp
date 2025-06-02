@@ -12,19 +12,28 @@ namespace godnet
 using TimerId = std::uint64_t;
 class Timer;
 using TimerPtr = std::shared_ptr<Timer>;
-using TimerCallback = std::function<void(TimerId)>;
+using TimerCallback = std::function<void()>;
+using TimerDuration = std::chrono::milliseconds;
+using TimerTimePoint =
+    std::chrono::time_point<std::chrono::steady_clock, TimerDuration>;
 using namespace std::chrono_literals;
 
 class Timer
 {
 public:
-    Timer(std::chrono::milliseconds expiration,
-          std::chrono::milliseconds interval,
+    static TimerTimePoint Now() noexcept
+    {
+        return std::chrono::time_point_cast<TimerDuration>(
+            std::chrono::steady_clock::now());
+    }
+
+    Timer(TimerTimePoint expiration,
+          TimerDuration interval,
           TimerCallback&& callback) noexcept;
 
     bool isRepeat() const noexcept
     {
-        return interval_ > 0ms;
+        return interval_ > TimerDuration::zero();
     }
     
     TimerId id() const noexcept
@@ -32,38 +41,42 @@ public:
         return id_;
     }
 
-    std::chrono::milliseconds expiration() const noexcept
+    TimerTimePoint expiration() const noexcept
     {
         return expiration_;
     }
 
-    std::chrono::milliseconds interval() const noexcept
+    TimerDuration interval() const noexcept
     {
         return interval_;
     }
 
-    void resetExpiration(std::chrono::milliseconds expiration) noexcept
+    void resetExpiration(TimerTimePoint expiration) noexcept
     {
         expiration_ = expiration + interval_;
     }
 
     void run() const noexcept
     {
-        callback_(id_);
+        callback_();
     }
 
 private:
     static TimerId GenerateTimerId() noexcept;
 
-    const TimerId id_{};
-    std::chrono::milliseconds expiration_{};
-    const std::chrono::milliseconds interval_{};
-    const TimerCallback callback_{};
+    const TimerId id_;
+    TimerTimePoint expiration_;
+    const TimerDuration interval_;
+    const TimerCallback callback_;
 };
 
 inline bool operator>(const TimerPtr& lhs, const TimerPtr& rhs) noexcept
 {
-    return lhs->expiration() > rhs->expiration();
+    if (lhs->expiration() != rhs->expiration())
+    {
+        return lhs->expiration() > rhs->expiration();
+    }
+    return lhs->id() > rhs->id();
 }
 
 }

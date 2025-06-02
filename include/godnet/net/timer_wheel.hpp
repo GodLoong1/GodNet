@@ -1,7 +1,6 @@
 #ifndef GODNET_NET_TIMER_WHEEL_HPP
 #define GODNET_NET_TIMER_WHEEL_HPP
 
-#include <chrono>
 #include <memory>
 #include <functional>
 #include <unordered_set>
@@ -9,10 +8,12 @@
 #include <vector>
 
 #include "godnet/util/noncopyable.hpp"
-#include "godnet/net/event_loop.hpp"
+#include "godnet/net/timer.hpp"
 
 namespace godnet
 {
+
+class EventLoop;
 
 /// 时间轮
 class TimerWheel : Noncopyable 
@@ -22,18 +23,13 @@ public:
     using EntryBucket = std::unordered_set<EntryPtr>;
     using BucketQueue = std::deque<EntryBucket>;
 
-    /**
-     * @param maxTimeout 最大定时时间
-     * @param ticksInterval 刻度间隔
-     * @param buckets 桶数
-     */
     TimerWheel(EventLoop* loop,
-               size_t maxTimeout,
-               std::chrono::milliseconds ticksInterval = 1ms,
-               size_t bucketNum = 100) noexcept;
+               TimerDuration maxTimeout,
+               TimerDuration ticksInterval = 1ms,
+               std::size_t bucketNum = 100) noexcept;
     ~TimerWheel() noexcept;
 
-    void insertEntry(size_t delay, EntryPtr&& entryPtr) noexcept;
+    void insertEntry(TimerDuration delay, EntryPtr&& entryPtr) noexcept;
 
     EventLoop* getLoop() const noexcept
     {
@@ -41,7 +37,7 @@ public:
     }
 
 private:
-    void insertEntryInLoop(size_t delay, EntryPtr&& entryPtr) noexcept;
+    void insertEntryInLoop(TimerDuration delay, EntryPtr&& entryPtr) noexcept;
     void onTimer() noexcept;
 
     class DelayEntry : Noncopyable
@@ -50,7 +46,7 @@ private:
         DelayEntry(std::function<void()>&& cb) noexcept
         : cb_(std::move(cb)) { }
 
-        ~DelayEntry() noexcept 
+        ~DelayEntry()
         {
             cb_();
         }
@@ -60,12 +56,12 @@ private:
     };
 
     EventLoop* loop_;
-    std::chrono::milliseconds ticksInterval_; // 刻度间隔
-    size_t bucketNum_; // 桶数
+    TimerDuration ticksInterval_;
+    std::size_t bucketNum_;
 
-    std::vector<BucketQueue> wheels_; // 时间轮
-    size_t tickCounter_{0}; // 刻度计数
-    TimerId timerId_{0}; // 定时器id
+    std::vector<BucketQueue> wheels_;
+    std::size_t tickCounter_{0};
+    TimerId timerId_{0};
 };
 
 }

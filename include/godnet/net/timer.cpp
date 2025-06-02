@@ -7,12 +7,12 @@ namespace godnet
 
 TimerId Timer::GenerateTimerId() noexcept
 {
-    static std::atomic<TimerId> id{0};
-    return ++id;
+    static std::atomic<TimerId> onlyId{0};
+    return ++onlyId;
 }
 
-Timer::Timer(std::chrono::milliseconds expiration,
-             std::chrono::milliseconds interval,
+Timer::Timer(TimerTimePoint expiration,
+             TimerDuration interval,
              TimerCallback&& callback) noexcept
 : id_(GenerateTimerId()),
   expiration_(expiration),

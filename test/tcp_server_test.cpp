@@ -9,7 +9,7 @@ int main()
 {
     godnet::EventLoop loop;
     godnet::TcpServer server(&loop, godnet::InetAddress::V4Any(9981));
-    server.setMessageCallback([](const godnet::TcpConnectionPtr& conn, godnet::MessageBuffer& buf) {
+    server.setMessageCallback([](const godnet::TcpConnectionPtr&, godnet::MessageBuffer& buf) {
         std::cout << buf.readAll() << std::endl;
     });
     server.setConnectionCallback([](const godnet::TcpConnectionPtr& conn) {

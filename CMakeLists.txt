@@ -40,5 +40,6 @@ include(find_ws2_32)
 
 # 添加子目录
 add_subdirectory(${CMAKE_SOURCE_DIR}/include/godnet)
-add_subdirectory(${CMAKE_SOURCE_DIR}/test)
 add_subdirectory(${CMAKE_SOURCE_DIR}/third_party)
+add_subdirectory(${CMAKE_SOURCE_DIR}/example)
+add_subdirectory(${CMAKE_SOURCE_DIR}/test)

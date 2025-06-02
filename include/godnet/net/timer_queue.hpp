@@ -1,7 +1,6 @@
 #ifndef GODNET_NET_TIMER_QUEUE_HPP
 #define GODNET_NET_TIMER_QUEUE_HPP
 
-#include <chrono>
 #include <queue>
 #include <unordered_set>
 
@@ -17,8 +16,8 @@ class TimerQueue
 public:
     explicit TimerQueue(EventLoop* loop);
 
-    TimerId addTimer(std::chrono::steady_clock::time_point expiration,
-                     std::chrono::milliseconds interval,
+    TimerId addTimer(TimerTimePoint expiration,
+                     TimerDuration interval,
                      TimerCallback&& callback) noexcept;
     void delTimer(TimerId id) noexcept;
 
@@ -26,9 +25,9 @@ public:
     void handlerTimer();
 
 private:
-    std::vector<TimerPtr> getExpiredTimers(std::chrono::milliseconds timeout) noexcept;
+    std::vector<TimerPtr> getExpiredTimers(TimerTimePoint now) noexcept;
     void resetExpiredTimers(const std::vector<TimerPtr>& expiredTimers,
-                            std::chrono::milliseconds timeout) noexcept;
+                            TimerTimePoint now) noexcept;
     void addTimerInLoop(const TimerPtr& timerPtr) noexcept;
     void delTimerInLoop(TimerId id) noexcept;
 

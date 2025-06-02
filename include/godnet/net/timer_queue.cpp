@@ -14,13 +14,11 @@ TimerQueue::TimerQueue(EventLoop* loop)
     assert(loop);
 }
 
-TimerId TimerQueue::addTimer(std::chrono::steady_clock::time_point expiration,
-                             std::chrono::milliseconds interval,
+TimerId TimerQueue::addTimer(TimerTimePoint expiration,
+                             TimerDuration interval,
                              TimerCallback&& callback) noexcept
 {
-    auto timerPtr = std::make_shared<Timer>(std::chrono::duration_cast<
-                                            std::chrono::milliseconds>(
-                                            expiration.time_since_epoch()),
+    auto timerPtr = std::make_shared<Timer>(expiration,
                                             interval,
                                             std::move(callback));
     if (loop_->isInLoopThread())
@@ -59,17 +57,14 @@ int TimerQueue::getNextTimeout() noexcept
         return -1;
     }
 
-    auto timeout =
-        std::chrono::duration_cast<std::chrono::milliseconds>(
-            std::chrono::steady_clock::now().time_since_epoch());
-
+    auto now = Timer::Now();
     const auto& timerPtr = timers_.top();
-    if (timerPtr->expiration() <= timeout)
+    if (timerPtr->expiration() <= now)
     {
         return 0;
     }
 
-    std::uint64_t diff = (timerPtr->expiration() - timeout).count();
+    std::uint64_t diff = (timerPtr->expiration() - now).count();
     if (diff > std::numeric_limits<int>::max())
     {
         diff = std::numeric_limits<int>::max();
@@ -81,11 +76,8 @@ void TimerQueue::handlerTimer()
 {
     loop_->assertInLoopThread();
 
-    auto timeout =
-        std::chrono::duration_cast<std::chrono::milliseconds>(
-            std::chrono::steady_clock::now().time_since_epoch());
-
-    auto expireds = getExpiredTimers(timeout);
+    auto now = Timer::Now();
+    auto expireds = getExpiredTimers(now);
     for (const auto& timerPtr : expireds)
     {
         if (timerIds_.find(timerPtr->id()) != timerIds_.end())
@@ -93,11 +85,10 @@ void TimerQueue::handlerTimer()
             timerPtr->run();
         }
     }
-    resetExpiredTimers(expireds, timeout);
+    resetExpiredTimers(expireds, now);
 }
 
-std::vector<TimerPtr> TimerQueue::getExpiredTimers(
-    std::chrono::milliseconds timeout) noexcept
+std::vector<TimerPtr> TimerQueue::getExpiredTimers(TimerTimePoint now) noexcept
 {
     loop_->assertInLoopThread();
 
@@ -105,7 +96,7 @@ std::vector<TimerPtr> TimerQueue::getExpiredTimers(
     while (!timers_.empty())
     {
         const auto& timerPtr = timers_.top();
-        if (timerPtr->expiration() <= timeout)
+        if (timerPtr->expiration() <= now)
         {
             expiredTimers.emplace_back(timerPtr);
             timers_.pop();
@@ -120,7 +111,7 @@ std::vector<TimerPtr> TimerQueue::getExpiredTimers(
 
 void TimerQueue::resetExpiredTimers(
     const std::vector<TimerPtr>& expiredTimers,
-    std::chrono::milliseconds timeout) noexcept
+    TimerTimePoint now) noexcept
 {
     loop_->assertInLoopThread();
 
@@ -130,7 +121,7 @@ void TimerQueue::resetExpiredTimers(
         {
             if (timerPtr->isRepeat())
             {
-                timerPtr->resetExpiration(timeout);
+                timerPtr->resetExpiration(now);
                 timers_.emplace(timerPtr);
             }
             else

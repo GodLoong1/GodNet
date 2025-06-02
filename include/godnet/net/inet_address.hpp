@@ -111,6 +111,9 @@ public:
     std::uint16_t toPort() const noexcept;
     std::string toIpPort() const noexcept;
 
+    friend bool operator==(const InetAddress& localAddr,
+                           const InetAddress& peerAddr) noexcept;
+
 private:
     union
     {

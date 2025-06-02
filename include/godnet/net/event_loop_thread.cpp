@@ -4,6 +4,7 @@
 #include <future>
 
 #include "godnet/util/system.hpp"
+#include "godnet/net/event_loop.hpp"
 
 namespace godnet
 {

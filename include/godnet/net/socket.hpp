@@ -63,6 +63,9 @@ int setKeepAlive(int sockfd, bool on) noexcept;
 // 获取套接字错误
 int getSocketError(int sockfd) noexcept;
 
+// 是否自连接
+bool isSelfConnect(int sockfd) noexcept;
+
 }
 
 #endif

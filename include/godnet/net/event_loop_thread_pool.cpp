@@ -2,6 +2,9 @@
 
 #include <cassert>
 
+#include "godnet/net/event_loop.hpp"
+#include "godnet/net/event_loop_thread.hpp"
+
 namespace godnet
 {
 
@@ -17,13 +20,13 @@ EventLoopThreadPool::EventLoopThreadPool(std::size_t threadNum) noexcept
 void EventLoopThreadPool::start() noexcept
 {
     assert(loops_.empty());
-    for (const std::unique_ptr<EventLoopThread>& loopPtr : loopThreads_)
+    for (const auto& loopPtr : loopThreads_)
     {
         loopPtr->start();
     }
 
     loops_.reserve(loops_.size());
-    for (const std::unique_ptr<EventLoopThread>& loopPtr : loopThreads_)
+    for (const auto& loopPtr : loopThreads_)
     {
         loops_.emplace_back(loopPtr->getLoop());
     }
@@ -32,7 +35,7 @@ void EventLoopThreadPool::start() noexcept
 void EventLoopThreadPool::stop() noexcept
 {
     assert(!loops_.empty());
-    for (const std::unique_ptr<EventLoopThread>& loopPtr : loopThreads_)
+    for (const auto& loopPtr : loopThreads_)
     {
         loopPtr->stop();
     }

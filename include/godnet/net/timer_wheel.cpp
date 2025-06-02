@@ -1,26 +1,28 @@
 #include "godnet/net/timer_wheel.hpp"
 
 #include <cassert>
-#include <chrono>
+
+#include "godnet/net/event_loop.hpp"
 
 namespace godnet
 {
 
 TimerWheel::TimerWheel(EventLoop* loop,
-                       size_t maxTimeout,
-                       std::chrono::milliseconds ticksInterval,
-                       size_t bucketNum) noexcept
+                       TimerDuration maxTimeout,
+                       TimerDuration ticksInterval,
+                       std::size_t bucketNum) noexcept
 : loop_(loop),
   ticksInterval_(ticksInterval),
   bucketNum_(bucketNum)
 {
-    assert(maxTimeout > 1);
-    assert(ticksInterval > 0ms);
+    assert(maxTimeout > TimerDuration::zero());
+    assert(ticksInterval > TimerDuration::zero());
+    assert(maxTimeout > ticksInterval);
     assert(bucketNum > 1);
 
     // 设置轮数
-    size_t maxBucketNum = maxTimeout / ticksInterval_.count();
-    size_t wheelsNum = 1;
+    std::size_t maxBucketNum = maxTimeout / ticksInterval_;
+    std::size_t wheelsNum = 1;
     while (maxBucketNum > bucketNum)
     {
         ++wheelsNum;
@@ -35,65 +37,69 @@ TimerWheel::TimerWheel(EventLoop* loop,
     }
 
     timerId_ = loop_->runTimerEvery(ticksInterval_, [this] {
-        onTimer();
-    });
+        ++tickCounter_;
+        size_t pow = 1;
 
-    LOG_TRACE << getThreadName() << ": maxTimeout: "
-              << maxTimeout << ", interval: " << ticksInterval_
-              << ", wheelsNum: " << wheelsNum << ", bucketNum: "
-              << bucketNum_;
+        for (BucketQueue& bucket : wheels_)
+        {
+            if ((tickCounter_ % pow) == 0)
+            {
+                bucket.pop_front();
+                bucket.emplace_back();
+            }
+            pow *= bucketNum_;
+        }
+    });
 }
 
 TimerWheel::~TimerWheel() noexcept
 {
-    loop_->assertInLoop();
+    loop_->assertInLoopThread();
 
     loop_->cancelTimer(timerId_);
     for (auto it = wheels_.rbegin(); it != wheels_.rend(); ++it)
     {
         it->clear();
     }
-
-    LOG_TRACE << getThreadName();
 }
 
-void TimerWheel::insertEntry(size_t delay, EntryPtr&& entryPtr) noexcept
+void TimerWheel::insertEntry(TimerDuration delay, EntryPtr&& entryPtr) noexcept
 {
-    if (loop_->isInLoop())
+    if (loop_->isInLoopThread())
     {
         insertEntryInLoop(delay, std::move(entryPtr));
     }
     else
     {
-        loop_->addInLoop(
+        loop_->queueInLoop(
             [this, delay, entryPtr(std::move(entryPtr))] () mutable {
                 insertEntryInLoop(delay, std::move(entryPtr));
         });
     }
 }
 
-void TimerWheel::insertEntryInLoop(size_t delay, EntryPtr&& entryPtr) noexcept
+void TimerWheel::insertEntryInLoop(TimerDuration delay, EntryPtr&& entryPtr) noexcept
 {
-    loop_->assertInLoop();
+    loop_->assertInLoopThread();
 
-    delay = static_cast<size_t>(delay / ticksInterval_ + 1);
-    size_t t = tickCounter_;
+    std::size_t index = static_cast<size_t>(delay / ticksInterval_ + 1);
+    std::size_t t = tickCounter_;
 
-    for (size_t i = 0; i != wheels_.size(); ++i)
+    for (std::size_t i = 0; i != wheels_.size(); ++i)
     {
         // 在第一个时间轮
-        if (delay <= bucketNum_)
+        if (index <= bucketNum_)
         {
-            wheels_[i][delay - 1].insert(std::move(entryPtr));
+            wheels_[i][index - 1].insert(std::move(entryPtr));
             break;
         }
         // 不是最后一个时间轮
         if (i != (wheels_.size() - 1))
         {
             entryPtr = std::make_shared<DelayEntry>(
-                [this, delay, i, t, entryPtr(std::move(entryPtr))] {
+                [this, index, i, t, entryPtr(std::move(entryPtr))] {
                     // 计算上一层的位置
-                    wheels_[i][(delay + (t % bucketNum_) - 1) %
+                    wheels_[i][(index + (t % bucketNum_) - 1) %
                                bucketNum_].insert(std::move(entryPtr));
             });
         }
@@ -104,26 +110,8 @@ void TimerWheel::insertEntryInLoop(size_t delay, EntryPtr&& entryPtr) noexcept
         }
 
         // 计算下一个轮间隔
-        delay = (delay + (t % bucketNum_) - 1) / bucketNum_;
+        index = (index + (t % bucketNum_) - 1) / bucketNum_;
         t /= bucketNum_;
-    }
-}
-
-void TimerWheel::onTimer() noexcept
-{
-    loop_->assertInLoop();
-
-    ++tickCounter_;
-    size_t pow = 1;
-
-    for (BucketQueue& bucket : wheels_)
-    {
-        if ((tickCounter_ % pow) == 0)
-        {
-            bucket.pop_front();
-            bucket.emplace_back();
-        }
-        pow *= bucketNum_;
     }
 }
 

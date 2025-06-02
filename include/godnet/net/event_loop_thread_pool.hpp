@@ -3,14 +3,15 @@
 
 #include <vector>
 #include <memory>
-#include <cstddef>
 
 #include "godnet/util/noncopyable.hpp"
-#include "godnet/net/event_loop.hpp"
 #include "godnet/net/event_loop_thread.hpp"
 
 namespace godnet
 {
+
+class EventLoop;
+class EventLoopThread;
 
 class EventLoopThreadPool : public Noncopyable
 {

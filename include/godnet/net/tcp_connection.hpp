@@ -62,6 +62,11 @@ public:
         closeCallback_ = std::move(callback);
     }
 
+    int getFd() const noexcept
+    {
+        return socket_.fd();
+    }
+
     const InetAddress& getLocalAddr() const noexcept
     {
         return localAddr_;
@@ -70,6 +75,16 @@ public:
     const InetAddress& getPeerAddr() const noexcept
     {
         return peerAddr_;
+    }
+
+    bool isConnected() const noexcept
+    {
+        return status_ == Status::connected;
+    }
+
+    bool isDisconnected() const noexcept
+    {
+        return status_ == Status::disconnected;
     }
 
 private:
@@ -85,10 +100,10 @@ private:
 private:
     enum class Status : std::uint8_t
     {
+        disconnected,
         connecting,
         connected,
         disconnecting,
-        disconnected,
     };
 
     EventLoop* loop_;

@@ -88,17 +88,21 @@ void EventPoller::updateChannel(EventChannel* channel) noexcept
         if (channel->isNoneEvent())
         {
             ctl(EPOLL_CTL_DEL, channel);
-            channels_.erase(channel);
+
+            [[maybe_unused]] auto n =  channels_.erase(channel);
+            assert(n == 1);
         }
         else
         {
             ctl(EPOLL_CTL_MOD, channel);
-            channels_.insert(channel);
         }
     }
     else
     {
         ctl(EPOLL_CTL_ADD, channel);
+
+        [[maybe_unused]] auto it = channels_.insert(channel);
+        assert(it.second);
     }
 }
 

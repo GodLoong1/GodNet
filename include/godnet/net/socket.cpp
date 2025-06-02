@@ -1,4 +1,6 @@
 #include "godnet/net/socket.hpp"
+#include "godnet/net/inet_address.hpp"
+#include "godnet/util/system.hpp"
 
 #ifdef __linux__
     #include <unistd.h>
@@ -103,9 +105,30 @@ int accept(int sockfd, InetAddress& peerAddr) noexcept
 
 int connect(int sockfd, const InetAddress& localAddr) noexcept
 {
-    return ::connect(sockfd,
-                     localAddr.getSockAddr(),
-                     localAddr.getSockLen());
+    int ret = ::connect(sockfd,
+                        localAddr.getSockAddr(),
+                        localAddr.getSockLen());
+    int err = ret ? system::getSystemErrno() : ret;
+    switch (err)
+    {
+        case 0:
+        case EINPROGRESS:
+        case EINTR:
+        case EISCONN:
+        {
+            ret = 0;
+            break;
+        }
+        case EAGAIN:
+        case ECONNREFUSED:
+        case ENETUNREACH:
+        default:
+        {
+            ret = -1;
+            break;
+        }
+    }
+    return ret;
 }
 
 std::int64_t read(int sockfd, char* buf[2], std::size_t len[2],
@@ -252,6 +275,21 @@ int getSocketError(int sockfd) noexcept
 #endif
     }
     return optval;
+}
+
+bool isSelfConnect(int sockfd) noexcept
+{
+    InetAddress localAddr;
+    if (getLocalAddr(sockfd, localAddr) < 0)
+    {
+        return false;
+    }
+    InetAddress peerAddr;
+    if (getPeerAddr(sockfd, peerAddr) < 0)
+    {
+        return false;
+    }
+    return localAddr == peerAddr;
 }
 
 }

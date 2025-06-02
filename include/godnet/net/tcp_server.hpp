@@ -7,6 +7,7 @@
 #include "godnet/net/tcp_acceptor.hpp"
 #include "godnet/net/tcp_connection.hpp"
 #include "godnet/net/event_loop.hpp"
+#include "godnet/net/event_loop_thread.hpp"
 #include "godnet/net/event_loop_thread_pool.hpp"
 #include "godnet/net/inet_address.hpp"
 

@@ -5,10 +5,11 @@
 #include <atomic>
 
 #include "godnet/util/noncopyable.hpp"
-#include "godnet/net/event_loop.hpp"
 
 namespace godnet
 {
+
+class EventLoop;
 
 class EventLoopThread : Noncopyable
 {

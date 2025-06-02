@@ -46,7 +46,7 @@ EventLoop::EventLoop() noexcept
         assert(event == 1);
     });
 #endif
-    GODNET_LOG_TRACE("threadId: {}", threadId_);
+    GODNET_LOG_TRACE("new EventLoop threadId: {}", threadId_);
 }
 
 EventLoop::~EventLoop()
@@ -54,9 +54,8 @@ EventLoop::~EventLoop()
     assertInLoopThread();
 
 #ifdef __linux__
-    ::close(wakeupFd_);
     wakeupChannel_->disableAll();
-#else
+    ::close(wakeupFd_);
 #endif
     currentThreadLoop = nullptr;
 }
@@ -121,22 +120,22 @@ void EventLoop::queueInLoop(EventCallback&& func) noexcept
     }
 }
 
-TimerId EventLoop::runTimer(std::chrono::milliseconds delay,
-                            std::chrono::milliseconds interval,
+TimerId EventLoop::runTimer(TimerDuration delay,
+                            TimerDuration interval,
                             TimerCallback&& callback) noexcept
 {
-    return timers_->addTimer(std::chrono::steady_clock::now() + delay,
+    return timers_->addTimer(Timer::Now() + delay,
                              interval,
                              std::move(callback));
 }
 
-TimerId EventLoop::runTimerAfter(std::chrono::milliseconds delay,
+TimerId EventLoop::runTimerAfter(TimerDuration delay,
                                  TimerCallback&& callback) noexcept
 {
-    return runTimer(delay, 0ms, std::move(callback));
+    return runTimer(delay, TimerDuration::zero(), std::move(callback));
 }
 
-TimerId EventLoop::runTimerEvery(std::chrono::milliseconds interval,
+TimerId EventLoop::runTimerEvery(TimerDuration interval,
                                  TimerCallback&& callback) noexcept
 {
     return runTimer(interval, interval, std::move(callback));
