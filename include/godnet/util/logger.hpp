@@ -24,7 +24,8 @@
     GODNET_LOG(err, msg ", errno: {}", godnet::system::getErrnoMsg())
 
 #define GODNET_LOG_SYSERR_N(msg, ...) \
-    GODNET_LOG(err, msg ", errno: {}", __VA_ARGS__, godnet::system::getErrnoMsg())
+    GODNET_LOG(err, msg ", errno: {}", \
+        __VA_ARGS__, godnet::system::getErrnoMsg())
 
 #define GODNET_LOG_SYSERR_OVERLOAD( \
     _1, _2, _3, _4, _5, _6, _7, _8, _9, _10, NAME, ...) NAME
