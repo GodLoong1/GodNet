@@ -38,7 +38,7 @@ std::string getErrnoMsg(int err) noexcept
     char buffer[256];
     int len = ::FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM |
                                FORMAT_MESSAGE_IGNORE_INSERTS |
-                               FORMAT_MESSAGE_MAX_WIDTH_MASH,
+                               FORMAT_MESSAGE_MAX_WIDTH_MASK,
                                nullptr,
                                err,
                                MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
