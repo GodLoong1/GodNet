@@ -41,7 +41,6 @@
         GODNET_LOG_SYSERR_N, \
         GODNET_LOG_SYSERR_N, \
         GODNET_LOG_SYSERR_N, \
-        GODNET_LOG_SYSERR_N, \
         GODNET_LOG_SYSERR_1) (__VA_ARGS__)
 
 namespace godnet
