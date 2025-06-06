@@ -43,7 +43,7 @@ std::string getErrnoMsg(int err) noexcept
                                err,
                                MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
                                buffer,
-                               sizeof(buffer);
+                               sizeof(buffer),
                                nullptr);
     return std::string(buffer, len);
 #else
