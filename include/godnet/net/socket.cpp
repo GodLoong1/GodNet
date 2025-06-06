@@ -44,7 +44,7 @@ int tcpSocket(int family) noexcept
                                            IPPROTO_TCP));
     if (sockfd >= 0)
     {
-        setSocketNonBlock(sockfd);
+        setNonBlack(sockfd);
     }
     return sockfd;
 #endif
@@ -62,7 +62,7 @@ int udpSocket(int family) noexcept
                                            IPPROTO_UDP));
     if (sockfd >= 0)
     {
-        setSocketNonBlock(sockfd);
+        setNonBlack(sockfd);
     }
     return sockfd;
 #endif
