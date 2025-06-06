@@ -5,9 +5,8 @@
 #include <functional>
 #include <any>
 
-#include "godnet/net/inet_address.hpp"
 #include "godnet/util/noncopyable.hpp"
-#include "godnet/net/event_channel.hpp"
+#include "godnet/net/inet_address.hpp"
 #include "godnet/net/message_buffer.hpp"
 #include "godnet/net/tcp_socket.hpp"
 
@@ -15,6 +14,7 @@ namespace godnet
 {
 
 class EventLoop;
+class EventChannel;
 class TcpConnection;
 
 using TcpConnectionPtr = std::shared_ptr<TcpConnection>;

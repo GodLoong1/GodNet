@@ -9,7 +9,6 @@
 
 #include <cassert>
 
-#include "godnet/util/system.hpp"
 #include "godnet/util/logger.hpp"
 #include "godnet/net/event_loop.hpp"
 #include "godnet/net/event_channel.hpp"
